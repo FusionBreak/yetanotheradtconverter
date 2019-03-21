@@ -20,6 +20,9 @@ namespace YetAnotherAdtConverter
             DirectoryInfo InputDir = new DirectoryInfo(config.InputDir);
             DirectoryInfo OutputDir = new DirectoryInfo(config.OutputDir);
 
+            if (!InputDir.Exists) InputDir.Create(); Logger.log("The input dir was not found and was created.", Logger.Type.WARNING, InputDir.FullName);
+            if (!OutputDir.Exists) OutputDir.Create(); Logger.log("The output dir was not found and was created.", Logger.Type.WARNING, OutputDir.FullName);
+
             //List<Files.WOTLK.ADT> adts = new List<Files.WOTLK.ADT>();
             //List<Files.BFA.ADT> new_adts = new List<Files.BFA.ADT>();
             //List<Files.BFA.OBJ0> new_obj0s = new List<Files.BFA.OBJ0>();
