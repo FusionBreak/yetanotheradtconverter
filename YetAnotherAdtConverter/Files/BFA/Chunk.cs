@@ -65,7 +65,7 @@ namespace YetAnotherAdtConverter.Files.BFA
 
         public void AddSize(int x)
         {
-            int old = BitConverter.ToInt32(Size);
+            int old = BitConverter.ToInt32(Size,0);
             Size = BitConverter.GetBytes(old+x);
             Byte_size = BitConverter.ToInt32(Size, 0);
         }

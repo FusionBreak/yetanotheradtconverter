@@ -99,7 +99,7 @@ namespace YetAnotherAdtConverter.Files.WOTLK.Chunks
                 {
                     byte[] ChunkMagic = reader.ReadBytes(4);
                     byte[] ChunkSize = reader.ReadBytes(4);
-                    byte[] ChunkContent = reader.ReadBytes(BitConverter.ToInt32(ChunkSize));
+                    byte[] ChunkContent = reader.ReadBytes(BitConverter.ToInt32(ChunkSize,0));
 
                     string ChunkMagicString = ADT.MagicBytesToString(ChunkMagic);
 

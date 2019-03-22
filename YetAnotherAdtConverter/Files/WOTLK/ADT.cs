@@ -45,7 +45,7 @@ namespace YetAnotherAdtConverter.Files.WOTLK
                 {
                     byte[] ChunkMagic = reader.ReadBytes(4);
                     byte[] ChunkSize = reader.ReadBytes(4);
-                    byte[] ChunkContent = reader.ReadBytes(BitConverter.ToInt32(ChunkSize));
+                    byte[] ChunkContent = reader.ReadBytes(BitConverter.ToInt32(ChunkSize,0));
 
                     string ChunkMagicString = MagicBytesToString(ChunkMagic);
                     //read the chunks
@@ -92,7 +92,7 @@ namespace YetAnotherAdtConverter.Files.WOTLK
                             break;
                     }
 
-                    if (ChunkMagicString == "MCNK") { MCNK_counter++; MCNK_size += BitConverter.ToInt32(ChunkSize); }
+                    if (ChunkMagicString == "MCNK") { MCNK_counter++; MCNK_size += BitConverter.ToInt32(ChunkSize,0); }
                     else if (ChunkMagicString == "\0\0\0\0") { /*Logger.log("0 Byte Chunk", Logger.Direction.WARNING);*/ }
                 }
 

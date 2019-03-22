@@ -15,7 +15,7 @@ namespace YetAnotherAdtConverter.Files.WOTLK.Chunks
             {
                 while (reader.BaseStream.Position < reader.BaseStream.Length)
                 {
-                    offsets.Add(BitConverter.ToUInt32(reader.ReadBytes(4)));
+                    offsets.Add(BitConverter.ToUInt32(reader.ReadBytes(4),0));
                 }
             }
         }
