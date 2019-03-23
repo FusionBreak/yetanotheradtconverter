@@ -28,7 +28,9 @@ namespace YetAnotherAdtConverter.Files.BFA.Chunks
                 mccv = new MCCV(wotlk.Mccv);
 
             mcnr = new MCNR(wotlk.Mcnr);
-            mcse = new MCSE(wotlk.Mcse);
+
+            if(wotlk.Mcse != null)
+                mcse = new MCSE(wotlk.Mcse);
 
             Header.ChangeSize(RecalculateSize());
         }
@@ -47,7 +49,9 @@ namespace YetAnotherAdtConverter.Files.BFA.Chunks
                 bytes.AddRange(mccv.GetBytes());
 
             bytes.AddRange(mcnr.GetBytes());
-            bytes.AddRange(mcse.GetBytes());
+
+            if (mcse != null)
+                bytes.AddRange(mcse.GetBytes());
 
             return bytes.ToArray();
         }
@@ -62,7 +66,10 @@ namespace YetAnotherAdtConverter.Files.BFA.Chunks
                 newSize += mccv.GetBytes().Length;
 
             newSize += mcnr.GetBytes().Length;
-            newSize += mcse.GetBytes().Length;
+
+            if(mcse != null)
+                newSize += mcse.GetBytes().Length;
+
             newSize += 128; //128 bytes for the MCNKheader
 
             return newSize; 

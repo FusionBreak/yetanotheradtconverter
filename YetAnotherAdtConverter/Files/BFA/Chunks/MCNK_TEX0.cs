@@ -13,12 +13,14 @@ namespace YetAnotherAdtConverter.Files.BFA.Chunks
         MCAL mcal;
         public MCNK_TEX0(WOTLK.Chunks.MCNK wotlk) : base(wotlk, false)
         {
-            mcly = new MCLY(wotlk.Mcly);
+            if (wotlk.Mcly != null)
+                mcly = new MCLY(wotlk.Mcly);
 
             if (wotlk.Mcsh != null)
                 mcsh = new MCSH(wotlk.Mcsh);
 
-            mcal = new MCAL(wotlk.Mcal);
+            if (wotlk.Mcal != null)
+                mcal = new MCAL(wotlk.Mcal);
 
             Header.ChangeSize(RecalculateSize());
         }
@@ -28,12 +30,14 @@ namespace YetAnotherAdtConverter.Files.BFA.Chunks
             List<byte> bytes = new List<byte>();
             bytes.AddRange(Header.GetBytes());
 
-            bytes.AddRange(mcly.GetBytes());
+            if (mcly != null)
+                bytes.AddRange(mcly.GetBytes());
 
             if (mcsh != null)
                 bytes.AddRange(mcsh.GetBytes());
 
-            bytes.AddRange(mcal.GetBytes());
+            if (mcal != null)
+                bytes.AddRange(mcal.GetBytes());
 
             return bytes.ToArray();
         }
@@ -42,12 +46,14 @@ namespace YetAnotherAdtConverter.Files.BFA.Chunks
         {
             int newSize = 0;
 
-            newSize += mcly.GetBytes().Length;
+            if (mcly != null)
+                newSize += mcly.GetBytes().Length;
 
             if (mcsh != null)
                 newSize += mcsh.GetBytes().Length;
 
-            newSize += mcal.GetBytes().Length;
+            if (mcal != null)
+                newSize += mcal.GetBytes().Length;
 
             return newSize;
         }

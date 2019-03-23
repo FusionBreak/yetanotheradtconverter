@@ -192,7 +192,7 @@ namespace YetAnotherAdtConverter.Files.WOTLK.Chunks
 
             using (BinaryReader reader = new BinaryReader(new MemoryStream(content)))
             {
-                for (int x = 0; reader.BaseStream.Position < reader.BaseStream.Length; x++)
+                for (int x = 0; reader.BaseStream.Position < reader.BaseStream.Length && x < 145; x++)
                 {
                     entries[x].X = reader.ReadByte();
                     entries[x].Z = reader.ReadByte();
