@@ -22,7 +22,6 @@ namespace YetAnotherAdtConverter
 
             try
             {
-                throw new FileNotFoundException();
 
                 if (!InputDir.Exists) { InputDir.Create(); Logger.log("The input dir was not found and was created.", Logger.Type.WARNING, InputDir.FullName); }
                 if (!OutputDir.Exists) { OutputDir.Create(); Logger.log("The output dir was not found and was created.", Logger.Type.WARNING, OutputDir.FullName); }
