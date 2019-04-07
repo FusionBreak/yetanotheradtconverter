@@ -7,22 +7,22 @@ namespace YetAnotherAdtConverter
     class Program
     {
         /*
-         * Unterschiede Legion -> BFA
+         *  Legion -> BFA
          * 
          *  _obj1.adt -> MLDX
          *  
          *  .tex -> ? but much
          */
         static public Config config = new Config();
+        static GroundEffectsAdder effectsAdder = new GroundEffectsAdder();
         static void Main(string[] args)
         {
-
             DirectoryInfo InputDir = new DirectoryInfo(config.InputDir);
             DirectoryInfo OutputDir = new DirectoryInfo(config.OutputDir);
 
             try
             {
-
+                
                 if (!InputDir.Exists) { InputDir.Create(); Logger.log("The input dir was not found and was created.", Logger.Type.WARNING, InputDir.FullName); }
                 if (!OutputDir.Exists) { OutputDir.Create(); Logger.log("The output dir was not found and was created.", Logger.Type.WARNING, OutputDir.FullName); }
                 foreach (FileInfo file in InputDir.GetFiles())
@@ -30,6 +30,11 @@ namespace YetAnotherAdtConverter
                     if (file.Name.Contains(".adt"))
                     {
                         Files.WOTLK.ADT adt = new Files.WOTLK.ADT(file.FullName);
+
+                        if(config.GroundEffectsAdding && !adt.ADTfileInfo.Name.Contains("#"))
+                        {
+                            adt = effectsAdder.AddGroundEffects(adt);
+                        }
                         new Files.BFA.ADT(adt).WriteFile(OutputDir);
                         new Files.BFA.OBJ0(adt).WriteFile(OutputDir);
                         new Files.BFA.OBJ1(adt).WriteFile(OutputDir);

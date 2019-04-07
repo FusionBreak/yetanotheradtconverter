@@ -61,11 +61,11 @@ namespace YetAnotherAdtConverter.Files.WOTLK.Chunks
                 mcHeader.NMapObjRefs = reader.ReadUInt32();
                 mcHeader.Holes = reader.ReadUInt32();
 
-                mcHeader.Unk = new UInt32[4];
-                mcHeader.Unk[0] = reader.ReadUInt32();
-                mcHeader.Unk[1] = reader.ReadUInt32();
-                mcHeader.Unk[2] = reader.ReadUInt32();
-                mcHeader.Unk[3] = reader.ReadUInt32();
+                mcHeader.GroundEffectsMap = new byte[16];
+                for(int x = 0; x < 16; x++)
+                {
+                    mcHeader.GroundEffectsMap[x] = reader.ReadByte();
+                }
 
                 mcHeader.PredTex = reader.ReadUInt32();
                 mcHeader.NoEffectDoodad = reader.ReadUInt32();
@@ -221,6 +221,7 @@ namespace YetAnotherAdtConverter.Files.WOTLK.Chunks
                     entry.Flags = reader.ReadUInt32();
                     entry.Ofsalphamap = reader.ReadUInt32();
                     entry.Detailtextureid = reader.ReadUInt32();
+
                     entries.Add(entry);
                 }
             }

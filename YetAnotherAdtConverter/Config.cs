@@ -14,6 +14,8 @@ namespace YetAnotherAdtConverter
         public int BoundingSize = 100;
         public int BoundingRadius = 200;
         public bool DynamicBoundingGeneration = true;
+        public bool GroundEffectsAdding = false;
+        public bool ReCalculateGroundEffectsMap = false;
 
         FileInfo configFile = new FileInfo("config.ini");
 
@@ -29,6 +31,8 @@ namespace YetAnotherAdtConverter
             Logger.log("Bounding size: " + BoundingSize, Logger.Type.LEVEL1);
             Logger.log("Bounding radius: " + BoundingRadius, Logger.Type.LEVEL1);
             Logger.log("Dynamic bounding generation: " + DynamicBoundingGeneration, Logger.Type.LEVEL1);
+            Logger.log("Adding ground effects: " + GroundEffectsAdding, Logger.Type.LEVEL1);
+            Logger.log("Recalculate the ground effects map: " + ReCalculateGroundEffectsMap, Logger.Type.LEVEL1);
             Logger.hr();
         }
 
@@ -68,6 +72,12 @@ namespace YetAnotherAdtConverter
                     case "DynamicBoundingGeneration":
                         DynamicBoundingGeneration = Convert.ToBoolean(setting[1].Trim());
                         break;
+                    case "GroundEffectsAdding":
+                        GroundEffectsAdding = Convert.ToBoolean(setting[1].Trim());
+                        break;
+                    case "ReCalculateGroundEffectsMap":
+                        ReCalculateGroundEffectsMap = Convert.ToBoolean(setting[1].Trim());
+                        break;
                 }
             }
         }
@@ -82,7 +92,9 @@ namespace YetAnotherAdtConverter
                 @"CreateMFBO=" + CreateMFBO,
                 @"BoundingSize=" + BoundingSize,
                 @"BoundingRadius=" + BoundingRadius,
-                @"DynamicBoundingGeneration=" + DynamicBoundingGeneration
+                @"DynamicBoundingGeneration=" + DynamicBoundingGeneration,
+                @"GroundEffectsAdding=" + GroundEffectsAdding,
+                @"ReCalculateGroundEffectsMap=" + ReCalculateGroundEffectsMap
             };
 
             File.WriteAllLines(configFile.Name, lines);

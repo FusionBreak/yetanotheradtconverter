@@ -27,7 +27,7 @@ namespace YetAnotherAdtConverter.Files.Structs
         UInt32 nMapObjRefs;
         UInt32 holes;
 
-        UInt32[] unk; // = new UInt32[4];
+        byte[] groundEffectsMap; // = new byte[16];
 
         UInt32 predTex;
         UInt32 noEffectDoodad;
@@ -70,11 +70,7 @@ namespace YetAnotherAdtConverter.Files.Structs
             bytes.AddRange(BitConverter.GetBytes(nMapObjRefs));
             bytes.AddRange(BitConverter.GetBytes(holes));
 
-
-            foreach (UInt32 x in unk)
-            {
-                bytes.AddRange(BitConverter.GetBytes(x));
-            }
+            bytes.AddRange(groundEffectsMap);
 
             bytes.AddRange(BitConverter.GetBytes(predTex));
             bytes.AddRange(BitConverter.GetBytes(noEffectDoodad));
@@ -108,7 +104,7 @@ namespace YetAnotherAdtConverter.Files.Structs
         public uint Areaid { get => areaid; set => areaid = value; }
         public uint NMapObjRefs { get => nMapObjRefs; set => nMapObjRefs = value; }
         public uint Holes { get => holes; set => holes = value; }
-        public uint[] Unk { get => unk; set => unk = value; }
+        public byte[] GroundEffectsMap { get => groundEffectsMap; set => groundEffectsMap = value; }
         public uint PredTex { get => predTex; set => predTex = value; }
         public uint NoEffectDoodad { get => noEffectDoodad; set => noEffectDoodad = value; }
         public uint NSndEmitters { get => nSndEmitters; set => nSndEmitters = value; }
