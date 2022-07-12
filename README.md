@@ -49,4 +49,4 @@ For more see [here](http://www.modcraft.io/index.php?topic=2357.0)...
 - [x] Inserting Groundeffects
 
 
-** 🛑 The further development for this project was stopped by me. 🛑 **
+🛑 **The further development for this project was stopped by me.** 🛑
