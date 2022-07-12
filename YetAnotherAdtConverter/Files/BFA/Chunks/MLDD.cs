@@ -1,36 +1,28 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using YetAnotherAdtConverter.Files.Structs;
-using YetAnotherAdtConverter.Files.WOTLK;
+﻿using YetAnotherAdtConverter.Files.Structs;
 
-namespace YetAnotherAdtConverter.Files.BFA.Chunks
+namespace YetAnotherAdtConverter.Files.BFA.Chunks;
+
+internal class MLDD : Chunk
 {
-    class MLDD : Chunk
+    private readonly List<DoodadDef> doodadDefs = new();
+
+    public MLDD(WOTLK.Chunks.MDDF wotlk) : base(wotlk, "MLDD")
     {
-        List<DoodadDef> doodadDefs = new List<DoodadDef>();
+        doodadDefs = wotlk.DoodadDefs;
+    }
 
-        public MLDD(WOTLK.Chunks.MDDF wotlk) : base(wotlk, "MLDD", false)
-        {
-            doodadDefs = wotlk.DoodadDefs;
-        }
+    public override byte[] GetBytes()
+    {
+        var bytes = new List<byte>();
+        bytes.AddRange(Header.GetBytes());
 
-        public override byte[] GetBytes()
-        {
-            List<byte> bytes = new List<byte>();
-            bytes.AddRange(Header.GetBytes());
+        foreach (var x in doodadDefs) bytes.AddRange(x.GetBytes());
 
-            foreach (DoodadDef x in doodadDefs)
-            {
-                bytes.AddRange(x.GetBytes());
-            }
+        return bytes.ToArray();
+    }
 
-            return bytes.ToArray();
-        }
-
-        public override int RecalculateSize()
-        {
-            throw new NotImplementedException();
-        }
+    public override int RecalculateSize()
+    {
+        throw new NotImplementedException();
     }
 }

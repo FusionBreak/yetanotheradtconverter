@@ -1,33 +1,22 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Text;
+﻿using System.Diagnostics;
 
-namespace YetAnotherAdtConverter.Files.WOTLK.Chunks
+namespace YetAnotherAdtConverter.Files.WOTLK.Chunks;
+
+[DebuggerDisplay("{wmos.Count} Files")]
+internal class MWMO : Chunk
 {
-    [System.Diagnostics.DebuggerDisplay("{wmos.Count} Files")]
-    class MWMO : Chunk
+    public MWMO(char[] magic, byte[] size, byte[] content) : base(magic, size)
     {
-        List<string> wmos = new List<string>();
-
-        public MWMO(char[] magic, byte[] size, byte[] content) : base(magic, size)
+        using var reader = new BinaryReader(new MemoryStream(content));
+        while (reader.BaseStream.Position < reader.BaseStream.Length)
         {
-            using (BinaryReader reader = new BinaryReader(new MemoryStream(content)))
-            {
-                while (reader.BaseStream.Position < reader.BaseStream.Length)
-                {
-                    string wmo = "";
+            var wmo = "";
 
-                    for (byte x = reader.ReadByte(); x != 0x00; x = reader.ReadByte())
-                    {
-                        wmo += Convert.ToChar(x);
-                    }
+            for (var x = reader.ReadByte(); x != 0x00; x = reader.ReadByte()) wmo += Convert.ToChar(x);
 
-                    wmos.Add(wmo);
-                }
-            }
+            Wmos.Add(wmo);
         }
-
-        public List<string> Wmos { get => wmos; set => wmos = value; }
     }
+
+    public List<string> Wmos { get; set; } = new();
 }

@@ -1,14 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿namespace YetAnotherAdtConverter.Files.Structs;
 
-namespace YetAnotherAdtConverter.Files.Structs
+internal struct Entry
 {
-    struct Entry
-    {
-        public UInt32 adress;
-        public UInt32 size;
-        public UInt32 flags;
-        public UInt32 asyncID;
-    }
+    public uint adress;
+    public uint size;
+    public uint flags;
+    public uint asyncID;
 }

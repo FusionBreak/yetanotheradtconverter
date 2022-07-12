@@ -1,32 +1,24 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Diagnostics;
 
-namespace YetAnotherAdtConverter.Files.Structs
+namespace YetAnotherAdtConverter.Files.Structs;
+
+[DebuggerDisplay("TextureID: {textid}")]
+internal struct MCLYentry
 {
-    [System.Diagnostics.DebuggerDisplay("TextureID: {textid}")]
-    struct MCLYentry
+    public uint Textid { get; set; }
+    public uint Flags { get; set; }
+    public uint Ofsalphamap { get; set; }
+    public uint Detailtextureid { get; set; }
+
+    public byte[] GetBytes()
     {
-        UInt32 textid;
-        UInt32 flags;
-        UInt32 ofsalphamap;
-        UInt32 detailtextureid;
+        var bytes = new List<byte>();
 
-        public uint Textid { get => textid; set => textid = value; }
-        public uint Flags { get => flags; set => flags = value; }
-        public uint Ofsalphamap { get => ofsalphamap; set => ofsalphamap = value; }
-        public uint Detailtextureid { get => detailtextureid; set => detailtextureid = value; }
+        bytes.AddRange(BitConverter.GetBytes(Textid));
+        bytes.AddRange(BitConverter.GetBytes(Flags));
+        bytes.AddRange(BitConverter.GetBytes(Ofsalphamap));
+        bytes.AddRange(BitConverter.GetBytes(Detailtextureid));
 
-        public byte[] GetBytes()
-        {
-            List<byte> bytes = new List<byte>();
-
-            bytes.AddRange(BitConverter.GetBytes(textid));
-            bytes.AddRange(BitConverter.GetBytes(flags));
-            bytes.AddRange(BitConverter.GetBytes(ofsalphamap));
-            bytes.AddRange(BitConverter.GetBytes(detailtextureid));
-
-            return bytes.ToArray();
-        }
+        return bytes.ToArray();
     }
 }

@@ -1,354 +1,325 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.IO;
+﻿using System.Diagnostics;
 using YetAnotherAdtConverter.Files.Structs;
 
-namespace YetAnotherAdtConverter.Files.WOTLK.Chunks
+namespace YetAnotherAdtConverter.Files.WOTLK.Chunks;
+
+internal class MCNK : Chunk
 {
-    class MCNK : Chunk
+    private MCNKheader mcHeader;
+
+    public MCNK(char[] magic, byte[] size, byte[] content) : base(magic, size)
     {
-        MCNKheader mcHeader;
+        using var reader = new BinaryReader(new MemoryStream(content));
 
-        //Subchunks
-        MCVT mcvt;
-        MCCV mccv;
-        MCNR mcnr;
-        MCLY mcly;
-        MCRF mcrf;
-        MCAL mcal;
-        MCSE mcse;
+        #region read MCNKhead
 
-        MCSH mcsh;
-        MCLQ mclq;      
+        mcHeader.Flags = reader.ReadUInt32();
+        mcHeader.IndexX = reader.ReadUInt32();
+        mcHeader.IndexY = reader.ReadUInt32();
+        mcHeader.NLayers = reader.ReadUInt32();
+        mcHeader.NDoodadRefs = reader.ReadUInt32();
 
-        public MCNK(char[] magic, byte[] size, byte[] content) : base (magic, size)
+        var offset = new offset
         {
-            using (BinaryReader reader = new BinaryReader(new MemoryStream(content)))
+            address = reader.ReadUInt32()
+        };
+        mcHeader.OfsMCVT = offset;
+
+        offset = new offset
+        {
+            address = reader.ReadUInt32()
+        };
+        mcHeader.OfsMCNR = offset;
+        offset = new offset
+        {
+            address = reader.ReadUInt32()
+        };
+        mcHeader.OfsMCLY = offset;
+        offset = new offset
+        {
+            address = reader.ReadUInt32()
+        };
+        mcHeader.OfsMCRF = offset;
+        offset = new offset
+        {
+            address = reader.ReadUInt32()
+        };
+        mcHeader.OfsMCAL = offset;
+
+        mcHeader.SizeAlpha = reader.ReadUInt32();
+
+        offset = new offset
+        {
+            address = reader.ReadUInt32()
+        };
+        mcHeader.OfsMCSH = offset;
+
+        mcHeader.SizeShadow = reader.ReadUInt32();
+        mcHeader.Areaid = reader.ReadUInt32();
+        mcHeader.NMapObjRefs = reader.ReadUInt32();
+        mcHeader.Holes = reader.ReadUInt32();
+
+        mcHeader.GroundEffectsMap = new byte[16];
+        for (var x = 0; x < 16; x++) mcHeader.GroundEffectsMap[x] = reader.ReadByte();
+
+        mcHeader.PredTex = reader.ReadUInt32();
+        mcHeader.NoEffectDoodad = reader.ReadUInt32();
+
+        offset = new offset
+        {
+            address = reader.ReadUInt32()
+        };
+        mcHeader.OfsMCSE = offset;
+
+        mcHeader.NSndEmitters = reader.ReadUInt32();
+
+        offset = new offset
+        {
+            address = reader.ReadUInt32()
+        };
+        mcHeader.OfsMCLQ = offset;
+
+        mcHeader.SizeLiquid = reader.ReadUInt32();
+
+        mcHeader.Pos = new float[3];
+        mcHeader.Pos[0] = reader.ReadSingle();
+        mcHeader.Pos[1] = reader.ReadSingle();
+        mcHeader.Pos[2] = reader.ReadSingle();
+
+        offset = new offset
+        {
+            address = reader.ReadUInt32()
+        };
+        mcHeader.OfsMCCV = offset;
+
+        mcHeader.Props = reader.ReadUInt32();
+        mcHeader.EffectId = reader.ReadUInt32();
+
+        #endregion
+
+        while (reader.BaseStream.Position < reader.BaseStream.Length)
+        {
+            var ChunkMagic = reader.ReadBytes(4);
+            var ChunkSize = reader.ReadBytes(4);
+            var ChunkContent = reader.ReadBytes(BitConverter.ToInt32(ChunkSize, 0));
+
+            var ChunkMagicString = ADT.MagicBytesToString(ChunkMagic);
+
+            switch (ChunkMagicString)
             {
-                #region read MCNKhead
-                mcHeader.Flags = reader.ReadUInt32();
-                mcHeader.IndexX = reader.ReadUInt32();
-                mcHeader.IndexY = reader.ReadUInt32();
-                mcHeader.NLayers = reader.ReadUInt32();
-                mcHeader.NDoodadRefs = reader.ReadUInt32();
+                case "MCVT":
+                    Mcvt = new MCVT(ADT.MagicBytesToChars(ChunkMagic), ChunkSize, ChunkContent);
+                    break;
+                case "MCCV":
+                    Mccv = new MCCV(ADT.MagicBytesToChars(ChunkMagic), ChunkSize, ChunkContent);
+                    break;
+                case "MCNR":
+                    Mcnr = new MCNR(ADT.MagicBytesToChars(ChunkMagic), ChunkSize, ChunkContent, reader.ReadBytes(13));
+                    break;
+                case "MCLY":
+                    Mcly = new MCLY(ADT.MagicBytesToChars(ChunkMagic), ChunkSize, ChunkContent);
+                    break;
+                case "MCRF":
+                    Mcrf = new MCRF(ADT.MagicBytesToChars(ChunkMagic), ChunkSize, ChunkContent);
+                    break;
+                case "MCAL":
+                    Mcal = new MCAL(ADT.MagicBytesToChars(ChunkMagic), ChunkSize, ChunkContent);
+                    break;
+                case "MCSE":
+                    Mcse = new MCSE(ADT.MagicBytesToChars(ChunkMagic), ChunkSize, ChunkContent);
+                    break;
 
-                offset offset = new offset();
-                offset.address = reader.ReadUInt32();
-                mcHeader.OfsMCVT = offset;
-
-                offset = new offset();
-                offset.address = reader.ReadUInt32();
-                mcHeader.OfsMCNR = offset;
-                offset = new offset();
-                offset.address = reader.ReadUInt32();
-                mcHeader.OfsMCLY = offset;
-                offset = new offset();
-                offset.address = reader.ReadUInt32();
-                mcHeader.OfsMCRF = offset;
-                offset = new offset();
-                offset.address = reader.ReadUInt32();
-                mcHeader.OfsMCAL = offset;
-
-                mcHeader.SizeAlpha = reader.ReadUInt32();
-
-                offset = new offset();
-                offset.address = reader.ReadUInt32();
-                mcHeader.OfsMCSH = offset;
-
-                mcHeader.SizeShadow = reader.ReadUInt32();
-                mcHeader.Areaid = reader.ReadUInt32();
-                mcHeader.NMapObjRefs = reader.ReadUInt32();
-                mcHeader.Holes = reader.ReadUInt32();
-
-                mcHeader.GroundEffectsMap = new byte[16];
-                for(int x = 0; x < 16; x++)
-                {
-                    mcHeader.GroundEffectsMap[x] = reader.ReadByte();
-                }
-
-                mcHeader.PredTex = reader.ReadUInt32();
-                mcHeader.NoEffectDoodad = reader.ReadUInt32();
-
-                offset = new offset();
-                offset.address = reader.ReadUInt32();
-                mcHeader.OfsMCSE = offset;
-
-                mcHeader.NSndEmitters = reader.ReadUInt32();
-
-                offset = new offset();
-                offset.address = reader.ReadUInt32();
-                mcHeader.OfsMCLQ = offset;
-
-                mcHeader.SizeLiquid = reader.ReadUInt32();
-
-                mcHeader.Pos = new float[3];
-                mcHeader.Pos[0] = reader.ReadSingle();
-                mcHeader.Pos[1] = reader.ReadSingle();
-                mcHeader.Pos[2] = reader.ReadSingle();
-
-                offset = new offset();
-                offset.address = reader.ReadUInt32();
-                mcHeader.OfsMCCV = offset;
-
-                mcHeader.Props = reader.ReadUInt32();
-                mcHeader.EffectId = reader.ReadUInt32();
-                #endregion
-
-                while (reader.BaseStream.Position < reader.BaseStream.Length)
-                {
-                    byte[] ChunkMagic = reader.ReadBytes(4);
-                    byte[] ChunkSize = reader.ReadBytes(4);
-                    byte[] ChunkContent = reader.ReadBytes(BitConverter.ToInt32(ChunkSize,0));
-
-                    string ChunkMagicString = ADT.MagicBytesToString(ChunkMagic);
-
-                    switch (ChunkMagicString)
-                    {
-                        case "MCVT":
-                            mcvt = new MCVT(ADT.MagicBytesToChars(ChunkMagic), ChunkSize, ChunkContent);
-                            break;
-                        case "MCCV":
-                            mccv = new MCCV(ADT.MagicBytesToChars(ChunkMagic), ChunkSize, ChunkContent);
-                            break;
-                        case "MCNR":
-                            mcnr = new MCNR(ADT.MagicBytesToChars(ChunkMagic), ChunkSize, ChunkContent, reader.ReadBytes(13));
-                            break;
-                        case "MCLY":
-                            mcly = new MCLY(ADT.MagicBytesToChars(ChunkMagic), ChunkSize, ChunkContent);
-                            break;
-                        case "MCRF":
-                            mcrf = new MCRF(ADT.MagicBytesToChars(ChunkMagic), ChunkSize, ChunkContent);
-                            break;
-                        case "MCAL":
-                            mcal = new MCAL(ADT.MagicBytesToChars(ChunkMagic), ChunkSize, ChunkContent);
-                            break;
-                        case "MCSE":
-                            mcse = new MCSE(ADT.MagicBytesToChars(ChunkMagic), ChunkSize, ChunkContent);
-                            break;
-
-                        case "MCSH":
-                            mcsh = new MCSH(ADT.MagicBytesToChars(ChunkMagic), ChunkSize, ChunkContent);
-                            break;
-                        case "MCLQ":
-                            mclq = new MCLQ(ADT.MagicBytesToChars(ChunkMagic), ChunkSize, ChunkContent);
-                            break;
-                    }
-
-                    //Logger.log(ChunkMagicString, Logger.Direction.LEVEL2, ChunkContent.Length.ToString() + " byte");
-                }
+                case "MCSH":
+                    Mcsh = new MCSH(ADT.MagicBytesToChars(ChunkMagic), ChunkSize, ChunkContent);
+                    break;
+                case "MCLQ":
+                    Mclq = new MCLQ(ADT.MagicBytesToChars(ChunkMagic), ChunkSize, ChunkContent);
+                    break;
             }
 
-            //Logger.log("---", Logger.Direction.LEVEL2);
+            //Logger.log(ChunkMagicString, Logger.Direction.LEVEL2, ChunkContent.Length.ToString() + " byte");
         }
 
-        internal MCVT Mcvt { get => mcvt; set => mcvt = value; }
-        internal MCNR Mcnr { get => mcnr; set => mcnr = value; }
-        internal MCLY Mcly { get => mcly; set => mcly = value; }
-        internal MCRF Mcrf { get => mcrf; set => mcrf = value; }
-        internal MCAL Mcal { get => mcal; set => mcal = value; }
-        internal MCSE Mcse { get => mcse; set => mcse = value; }
-        internal MCSH Mcsh { get => mcsh; set => mcsh = value; }
-        internal MCLQ Mclq { get => mclq; set => mclq = value; }
-        internal MCCV Mccv { get => mccv; set => mccv = value; }
-        internal MCNKheader MCHeader { get => mcHeader; set => mcHeader = value; }
+        //Logger.log("---", Logger.Direction.LEVEL2);
     }
 
-    #region subchunks
-    class MCVT : Chunk
+    internal MCVT Mcvt { get; set; }
+    internal MCNR Mcnr { get; set; }
+    internal MCLY Mcly { get; set; }
+    internal MCRF Mcrf { get; set; }
+    internal MCAL Mcal { get; set; }
+    internal MCSE Mcse { get; set; }
+    internal MCSH Mcsh { get; set; }
+    internal MCLQ Mclq { get; set; }
+    internal MCCV Mccv { get; set; }
+
+    internal MCNKheader MCHeader
     {
-        float[] heightmap; // = new float[9*9 + 8*8];
-
-        public MCVT(char[] magic, byte[] size, byte[] content) : base(magic, size, true)
-        {
-            heightmap = new float[9 * 9 + 8 * 8]; // = [145]
-
-            using (BinaryReader reader = new BinaryReader(new MemoryStream(content)))
-            {
-                for (int x = 0; reader.BaseStream.Position < reader.BaseStream.Length; x++)
-                {
-                    heightmap[x] = reader.ReadSingle();
-                }
-            }
-        }
-
-        public float[] Heightmap { get => heightmap; set => heightmap = value; }
+        get => mcHeader;
+        set => mcHeader = value;
     }
-
-    class MCNR : Chunk
-    {
-        MCNRentry[] entries; // = new MCNRentry[9*9 + 8*8];
-
-        byte[] padding;  /* = new byte[13]; | this data is not included in the MCNR chunk but additional data which purpose is unknown. 0.5.3.3368 lists this as padding
-         always 0 112 245  18 0  8 0 0  0 84  245 18 0. Nobody yet found a different pattern. The data is not derived from the normals.
-         It also does not seem that the client reads this data. --Schlumpf (talk) 23:01, 26 July 2015 (UTC)
-         While stated that this data is not "included in the MCNR chunk", the chunk-size defined for the MCNR chunk does cover this data. --Kruithne Feb 2016
-         ... from Cataclysm only (on LK files and before, MCNR defined size is 435 and not 448) Mjollna (talk) */
-
-        public MCNR(char[] magic, byte[] size, byte[] content, byte[] pad) : base(magic, size, true)
-        {
-            entries = new MCNRentry[9 * 9 + 8 * 8]; //= [145]
-            padding = pad;
-
-            using (BinaryReader reader = new BinaryReader(new MemoryStream(content)))
-            {
-                for (int x = 0; reader.BaseStream.Position < reader.BaseStream.Length && x < 145; x++)
-                {
-                    entries[x].X = reader.ReadByte();
-                    entries[x].Z = reader.ReadByte();
-                    entries[x].Y = reader.ReadByte();
-                }
-            }
-        }
-
-        public byte[] Padding { get => padding; set => padding = value; }
-        internal MCNRentry[] Entries { get => entries; set => entries = value; }
-    }
-
-    class MCLY : Chunk
-    {
-        List<MCLYentry> entries;
-
-        public MCLY(char[] magic, byte[] size, byte[] content) : base(magic, size, true)
-        {
-            entries = new List<MCLYentry>();
-            using (BinaryReader reader = new BinaryReader(new MemoryStream(content)))
-            {
-                for(int x = 0; (reader.BaseStream.Position < reader.BaseStream.Length) && x < 4; x++)
-                {
-                    MCLYentry entry = new MCLYentry();
-                    entry.Textid = reader.ReadUInt32();
-                    entry.Flags = reader.ReadUInt32();
-                    entry.Ofsalphamap = reader.ReadUInt32();
-                    entry.Detailtextureid = reader.ReadUInt32();
-
-                    entries.Add(entry);
-                }
-            }
-        }
-
-        internal List<MCLYentry> Entries { get => entries; set => entries = value; }
-    }
-
-    
-
-    [System.Diagnostics.DebuggerDisplay("Doodad Count: {doodads.Length}")]
-    class MCRF : Chunk
-    {
-        UInt32[] doodads;
-        public MCRF(char[] magic, byte[] size, byte[] content) : base(magic, size, true)
-        {
-            doodads = new UInt32[content.Length/4]; //4 = Length of a UInt32
-
-            using (BinaryReader reader = new BinaryReader(new MemoryStream(content)))
-            {
-                for (int x = 0;reader.BaseStream.Position < reader.BaseStream.Length; x++)
-                {
-                    doodads[x] = reader.ReadUInt32();
-                }               
-            }
-        }
-
-        public uint[] Doodads { get => doodads; set => doodads = value; }
-    }
-
-    class MCAL : Chunk
-    {
-        byte[] data;
-
-        public MCAL(char[] magic, byte[] size, byte[] content) : base(magic, size, true)
-        {
-            data = content;
-        }
-
-        public byte[] Data { get => data; set => data = value; }
-    }
-
-    [System.Diagnostics.DebuggerDisplay("Count: {count}")]
-    class MCSE : Chunk
-    {
-        MCSEentry[] entries;
-        int count = 0;
-
-        public MCSE(char[] magic, byte[] size, byte[] content) : base(magic, size, true)
-        {
-            
-            if(content.Length / 28 > 0)
-            {
-                entries = new MCSEentry[content.Length / 28]; //28 = Byte-length of a MCSEentry
-
-                using (BinaryReader reader = new BinaryReader(new MemoryStream(content)))
-                {
-                    for (int x = 0; reader.BaseStream.Position < reader.BaseStream.Length; x++)
-                    {
-                        entries[x].Dbcidd = reader.ReadUInt32();
-
-                        Vector vector = new Vector();
-                        vector.X = reader.ReadSingle();
-                        vector.Y = reader.ReadSingle();
-                        vector.Z = reader.ReadSingle();
-                        entries[x].Position = vector;
-
-                        vector = new Vector();
-                        vector.X = reader.ReadSingle();
-                        vector.Y = reader.ReadSingle();
-                        vector.Z = reader.ReadSingle();
-                        entries[x].Radius = vector;
-
-                    }
-                }
-
-                count = entries.Length;
-            }
-        }
-
-        public int Count { get => count; set => count = value; }
-        internal MCSEentry[] Entries { get => entries; set => entries = value; }
-    }
-
-    class MCSH : Chunk
-    {
-        byte[] data;
-
-        public MCSH(char[] magic, byte[] size, byte[] content) : base(magic, size, true)
-        {
-            data = content;
-        }
-
-        public byte[] Data { get => data; set => data = value; }
-    }
-
-    class MCLQ : Chunk
-    {
-        byte[] data;
-
-        public MCLQ(char[] magic, byte[] size, byte[] content) : base(magic, size, true)
-        {
-            data = content;
-        }
-    }
-
-    class MCCV : Chunk
-    {
-        MCCVentry[] entries;
-
-        public MCCV(char[] magic, byte[] size, byte[] content) : base(magic, size, true)
-        {
-            entries = new MCCVentry[9 * 9 + 8 * 8]; //= [145]
-
-            using (BinaryReader reader = new BinaryReader(new MemoryStream(content)))
-            {
-                for (int x = 0; reader.BaseStream.Position < reader.BaseStream.Length; x++)
-                {
-                    entries[x].Blue = reader.ReadByte();
-                    entries[x].Green = reader.ReadByte();
-                    entries[x].Red = reader.ReadByte();
-                    entries[x].Alpha = reader.ReadByte();
-                }
-            }
-        }
-
-        internal MCCVentry[] Entries { get => entries; set => entries = value; }
-    }
-    #endregion
 }
+
+#region subchunks
+
+internal class MCVT : Chunk
+{
+    public MCVT(char[] magic, byte[] size, byte[] content) : base(magic, size, true)
+    {
+        Heightmap = new float[9 * 9 + 8 * 8]; // = [145]
+
+        using var reader = new BinaryReader(new MemoryStream(content));
+        for (var x = 0; reader.BaseStream.Position < reader.BaseStream.Length; x++) Heightmap[x] = reader.ReadSingle();
+    }
+
+    public float[] Heightmap { get; set; }
+}
+
+internal class MCNR : Chunk
+{
+    public MCNR(char[] magic, byte[] size, byte[] content, byte[] pad) : base(magic, size, true)
+    {
+        Entries = new MCNRentry[9 * 9 + 8 * 8]; //= [145]
+        Padding = pad;
+
+        using var reader = new BinaryReader(new MemoryStream(content));
+        for (var x = 0; reader.BaseStream.Position < reader.BaseStream.Length && x < 145; x++)
+        {
+            Entries[x].X = reader.ReadByte();
+            Entries[x].Z = reader.ReadByte();
+            Entries[x].Y = reader.ReadByte();
+        }
+    }
+
+    public byte[] Padding { get; set; }
+    internal MCNRentry[] Entries { get; set; }
+}
+
+internal class MCLY : Chunk
+{
+    public MCLY(char[] magic, byte[] size, byte[] content) : base(magic, size, true)
+    {
+        Entries = new List<MCLYentry>();
+        using var reader = new BinaryReader(new MemoryStream(content));
+        for (var x = 0; reader.BaseStream.Position < reader.BaseStream.Length && x < 4; x++)
+        {
+            var entry = new MCLYentry
+            {
+                Textid = reader.ReadUInt32(),
+                Flags = reader.ReadUInt32(),
+                Ofsalphamap = reader.ReadUInt32(),
+                Detailtextureid = reader.ReadUInt32()
+            };
+
+            Entries.Add(entry);
+        }
+    }
+
+    internal List<MCLYentry> Entries { get; set; }
+}
+
+[DebuggerDisplay("Doodad Count: {doodads.Length}")]
+internal class MCRF : Chunk
+{
+    public MCRF(char[] magic, byte[] size, byte[] content) : base(magic, size, true)
+    {
+        Doodads = new uint[content.Length / 4]; //4 = Length of a UInt32
+
+        using var reader = new BinaryReader(new MemoryStream(content));
+        for (var x = 0; reader.BaseStream.Position < reader.BaseStream.Length; x++) Doodads[x] = reader.ReadUInt32();
+    }
+
+    public uint[] Doodads { get; set; }
+}
+
+internal class MCAL : Chunk
+{
+    public MCAL(char[] magic, byte[] size, byte[] content) : base(magic, size, true)
+    {
+        Data = content;
+    }
+
+    public byte[] Data { get; set; }
+}
+
+[DebuggerDisplay("Count: {count}")]
+internal class MCSE : Chunk
+{
+    public MCSE(char[] magic, byte[] size, byte[] content) : base(magic, size, true)
+    {
+        if (content.Length / 28 > 0)
+        {
+            Entries = new MCSEentry[content.Length / 28]; //28 = Byte-length of a MCSEentry
+
+            using (var reader = new BinaryReader(new MemoryStream(content)))
+            {
+                for (var x = 0; reader.BaseStream.Position < reader.BaseStream.Length; x++)
+                {
+                    Entries[x].Dbcidd = reader.ReadUInt32();
+
+                    var vector = new Vector
+                    {
+                        X = reader.ReadSingle(),
+                        Y = reader.ReadSingle(),
+                        Z = reader.ReadSingle()
+                    };
+                    Entries[x].Position = vector;
+
+                    vector = new Vector
+                    {
+                        X = reader.ReadSingle(),
+                        Y = reader.ReadSingle(),
+                        Z = reader.ReadSingle()
+                    };
+                    Entries[x].Radius = vector;
+                }
+            }
+
+            Count = Entries.Length;
+        }
+    }
+
+    public int Count { get; set; }
+    internal MCSEentry[] Entries { get; set; }
+}
+
+internal class MCSH : Chunk
+{
+    public MCSH(char[] magic, byte[] size, byte[] content) : base(magic, size, true)
+    {
+        Data = content;
+    }
+
+    public byte[] Data { get; set; }
+}
+
+internal class MCLQ : Chunk
+{
+    private readonly byte[] data;
+
+    public MCLQ(char[] magic, byte[] size, byte[] content) : base(magic, size, true)
+    {
+        data = content;
+    }
+}
+
+internal class MCCV : Chunk
+{
+    public MCCV(char[] magic, byte[] size, byte[] content) : base(magic, size, true)
+    {
+        Entries = new MCCVentry[9 * 9 + 8 * 8]; //= [145]
+
+        using var reader = new BinaryReader(new MemoryStream(content));
+        for (var x = 0; reader.BaseStream.Position < reader.BaseStream.Length; x++)
+        {
+            Entries[x].Blue = reader.ReadByte();
+            Entries[x].Green = reader.ReadByte();
+            Entries[x].Red = reader.ReadByte();
+            Entries[x].Alpha = reader.ReadByte();
+        }
+    }
+
+    internal MCCVentry[] Entries { get; set; }
+}
+
+#endregion

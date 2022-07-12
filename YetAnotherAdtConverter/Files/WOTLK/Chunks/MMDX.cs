@@ -1,33 +1,22 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Text;
+﻿using System.Diagnostics;
 
-namespace YetAnotherAdtConverter.Files.WOTLK.Chunks
+namespace YetAnotherAdtConverter.Files.WOTLK.Chunks;
+
+[DebuggerDisplay("{m2s.Count} Files")]
+internal class MMDX : Chunk
 {
-    [System.Diagnostics.DebuggerDisplay("{m2s.Count} Files")]
-    class MMDX : Chunk
+    public MMDX(char[] magic, byte[] size, byte[] content) : base(magic, size)
     {
-        List<string> m2s = new List<string>();
-
-        public MMDX(char[] magic, byte[] size, byte[] content) : base(magic, size)
+        using var reader = new BinaryReader(new MemoryStream(content));
+        while (reader.BaseStream.Position < reader.BaseStream.Length)
         {
-            using (BinaryReader reader = new BinaryReader(new MemoryStream(content)))
-            {
-                while (reader.BaseStream.Position < reader.BaseStream.Length)
-                {
-                    string m2 = "";
+            var m2 = "";
 
-                    for (byte x = reader.ReadByte(); x != 0x00; x = reader.ReadByte())
-                    {
-                        m2 += Convert.ToChar(x);
-                    }
+            for (var x = reader.ReadByte(); x != 0x00; x = reader.ReadByte()) m2 += Convert.ToChar(x);
 
-                    m2s.Add(m2);
-                }
-            }
+            M2s.Add(m2);
         }
-
-        public List<string> M2s { get => m2s; set => m2s = value; }
     }
+
+    public List<string> M2s { get; set; } = new();
 }

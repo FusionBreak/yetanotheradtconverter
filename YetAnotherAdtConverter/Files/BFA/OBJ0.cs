@@ -1,70 +1,55 @@
-﻿using System.Collections.Generic;
-using System.IO;
+﻿using System.Diagnostics;
 using YetAnotherAdtConverter.Files.BFA.Chunks;
 
+namespace YetAnotherAdtConverter.Files.BFA;
 
-namespace YetAnotherAdtConverter.Files.BFA
+[DebuggerDisplay("{ADTfileInfo.Name}")]
+internal class OBJ0
 {
-    [System.Diagnostics.DebuggerDisplay("{ADTfileInfo.Name}")]
-    class OBJ0
+    private readonly FileInfo ADTfileInfo;
+    private readonly int MCNKLength;
+    private readonly List<MCNK_OBJ0> MCNKs = new();
+    public MDDF MDDF;
+    public MMDX MMDX;
+    public MMID MMID;
+    public MODF MODF;
+
+    public MVER MVER;
+    public MWID MWID;
+    public MWMO MWMO;
+
+    public OBJ0(WOTLK.ADT wotlk)
     {
-        FileInfo ADTfileInfo;
-        int MCNKLength = 0;
+        ADTfileInfo = new FileInfo(wotlk.ADTfileInfo.Name.Split('.')[0] + "_obj0.adt");
 
-        public MVER MVER;
-        public MMDX MMDX;
-        public MMID MMID;
-        public MWMO MWMO;
-        public MWID MWID;
-        public MDDF MDDF;
-        public MODF MODF;
+        MVER = new MVER(wotlk.MVER);
+        MMDX = new MMDX(wotlk.MMDX);
+        MMID = new MMID(wotlk.MMID);
+        MWMO = new MWMO(wotlk.MWMO);
+        MWID = new MWID(wotlk.MWID);
+        MDDF = new MDDF(wotlk.MDDF);
+        MODF = new MODF(wotlk.MODF);
 
-        List<MCNK_OBJ0> MCNKs = new List<MCNK_OBJ0>();
-
-        public OBJ0(Files.WOTLK.ADT wotlk)
+        foreach (var x in wotlk.MCNKs)
         {
-            ADTfileInfo = new FileInfo(wotlk.ADTfileInfo.Name.Split('.')[0] + "_obj0.adt");
-
-            MVER = new MVER(wotlk.MVER);
-            MMDX = new MMDX(wotlk.MMDX);
-            MMID = new MMID(wotlk.MMID);
-            MWMO = new MWMO(wotlk.MWMO);
-            MWID = new MWID(wotlk.MWID);
-            MDDF = new MDDF(wotlk.MDDF);
-            MODF = new MODF(wotlk.MODF);
-
-            foreach(Files.WOTLK.Chunks.MCNK x in wotlk.MCNKs)
-            {
-                MCNKs.Add(new MCNK_OBJ0(x));
-                MCNKLength += MCNKs[MCNKs.Count - 1].GetBytes().Length;
-            }
-
+            MCNKs.Add(new MCNK_OBJ0(x));
+            MCNKLength += MCNKs[^1].GetBytes().Length;
         }
+    }
 
-        public void WriteFile(DirectoryInfo directory)
-        {
+    public void WriteFile(DirectoryInfo directory)
+    {
+        if (!directory.Exists) directory.Create();
 
-            if(!directory.Exists)
-            {
-                directory.Create();
-            }
+        using var writer = new BinaryWriter(File.Open(directory.FullName + "\\" + ADTfileInfo.Name, FileMode.Create));
+        writer.Write(MVER.GetBytes());
+        writer.Write(MMDX.GetBytes());
+        writer.Write(MMID.GetBytes());
+        writer.Write(MWMO.GetBytes());
+        writer.Write(MWID.GetBytes());
+        writer.Write(MDDF.GetBytes());
+        writer.Write(MODF.GetBytes());
 
-            using(BinaryWriter writer = new BinaryWriter(File.Open(directory.FullName + "\\" + ADTfileInfo.Name, FileMode.Create)))
-            {
-                writer.Write(MVER.GetBytes());
-                writer.Write(MMDX.GetBytes());
-                writer.Write(MMID.GetBytes());
-                writer.Write(MWMO.GetBytes());
-                writer.Write(MWID.GetBytes());
-                writer.Write(MDDF.GetBytes());
-                writer.Write(MODF.GetBytes());
-
-
-                foreach(MCNK_OBJ0 x in MCNKs)
-                {
-                    writer.Write(x.GetBytes());
-                }
-            }
-        }
+        foreach (var x in MCNKs) writer.Write(x.GetBytes());
     }
 }

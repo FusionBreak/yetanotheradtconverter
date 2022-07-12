@@ -1,213 +1,199 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.IO;
+﻿using System.Diagnostics;
 using YetAnotherAdtConverter.Files.Structs;
-using YetAnotherAdtConverter.Files.WOTLK;
+using YetAnotherAdtConverter.Files.WOTLK.Chunks;
 
-namespace YetAnotherAdtConverter.Files.BFA.Chunks
+namespace YetAnotherAdtConverter.Files.BFA.Chunks;
+
+internal class MCNK_ADT : Chunk
 {
-    class MCNK_ADT : Chunk
+    private readonly MCCV mccv;
+    private readonly MCNR mcnr;
+    private readonly MCSE mcse;
+
+    //Subchunks
+    private readonly MCVT mcvt;
+    private MCNKheader mcHeader;
+
+    public MCNK_ADT(MCNK wotlk) : base(wotlk)
     {
-        MCNKheader mcHeader;
+        mcHeader = wotlk.MCHeader;
 
-        //Subchunks
-        MCVT mcvt;
-        MCCV mccv;
-        MCNR mcnr;       
-        MCSE mcse;
+        mcvt = new MCVT(wotlk.Mcvt);
 
+        if (wotlk.Mccv != null)
+            mccv = new MCCV(wotlk.Mccv);
 
-        public MCNK_ADT(Files.WOTLK.Chunks.MCNK wotlk) : base(wotlk)
-        {
-            mcHeader = wotlk.MCHeader;
+        mcnr = new MCNR(wotlk.Mcnr);
 
-            mcvt = new MCVT(wotlk.Mcvt);
+        if (wotlk.Mcse != null)
+            mcse = new MCSE(wotlk.Mcse);
 
-            if(wotlk.Mccv != null)
-                mccv = new MCCV(wotlk.Mccv);
-
-            mcnr = new MCNR(wotlk.Mcnr);
-
-            if(wotlk.Mcse != null)
-                mcse = new MCSE(wotlk.Mcse);
-
-            Header.ChangeSize(RecalculateSize());
-        }
-
-        public override byte[] GetBytes()
-        {
-            List<byte> bytes = new List<byte>();
-
-            bytes.AddRange(Header.GetBytes());
-
-            bytes.AddRange(mcHeader.GetBytes());
-
-            bytes.AddRange(mcvt.GetBytes());
-
-            if(mccv != null)
-                bytes.AddRange(mccv.GetBytes());
-
-            bytes.AddRange(mcnr.GetBytes());
-
-            if (mcse != null)
-                bytes.AddRange(mcse.GetBytes());
-
-            return bytes.ToArray();
-        }
-
-        public override int RecalculateSize()
-        {
-            int newSize = 0;
-
-            newSize += mcvt.GetBytes().Length;
-
-            if(mccv != null)
-                newSize += mccv.GetBytes().Length;
-
-            newSize += mcnr.GetBytes().Length;
-
-            if(mcse != null)
-                newSize += mcse.GetBytes().Length;
-
-            newSize += 128; //128 bytes for the MCNKheader
-
-            return newSize; 
-        }
-    }  
-
-    #region subchunks
-    class MCVT : Chunk
-    {
-        float[] heightmap; // = new float[9*9 + 8*8];
-
-        public MCVT(Files.WOTLK.Chunks.MCVT wotlk) : base(wotlk, true)
-        {
-            heightmap = wotlk.Heightmap; // = [145]
-        }
-
-        public override byte[] GetBytes()
-        {
-            List<byte> bytes = new List<byte>();
-
-            bytes.AddRange(Header.GetBytes());
-
-            foreach (float x in heightmap)
-            {
-                bytes.AddRange(BitConverter.GetBytes(x));
-            }
-
-            return bytes.ToArray();
-        }
-
-        public override int RecalculateSize()
-        {
-            throw new NotImplementedException();
-        }
+        Header.ChangeSize(RecalculateSize());
     }
 
-    class MCCV : Chunk
+    public override byte[] GetBytes()
     {
-        MCCVentry[] entries;
+        var bytes = new List<byte>();
 
-        public MCCV(Files.WOTLK.Chunks.MCCV wotlk) : base(wotlk, true)
-        {
-            entries = wotlk.Entries;
-        }
+        bytes.AddRange(Header.GetBytes());
 
-        public override byte[] GetBytes()
-        {
-            List<byte> bytes = new List<byte>();
+        bytes.AddRange(mcHeader.GetBytes());
 
-            bytes.AddRange(Header.GetBytes());
+        bytes.AddRange(mcvt.GetBytes());
 
-            foreach (MCCVentry x in entries)
-            {
-                bytes.AddRange(x.GetBytes());
-            }
+        if (mccv != null)
+            bytes.AddRange(mccv.GetBytes());
 
-            return bytes.ToArray();
-        }
+        bytes.AddRange(mcnr.GetBytes());
 
-        public override int RecalculateSize()
-        {
-            throw new NotImplementedException();
-        }
+        if (mcse != null)
+            bytes.AddRange(mcse.GetBytes());
+
+        return bytes.ToArray();
     }
 
-    class MCNR : Chunk
+    public override int RecalculateSize()
     {
-        MCNRentry[] entries; // = new MCNRentry[9*9 + 8*8];
+        var newSize = 0;
 
-        byte[] padding;  /* = new byte[13]; | this data is not included in the MCNR chunk but additional data which purpose is unknown. 0.5.3.3368 lists this as padding
+        newSize += mcvt.GetBytes().Length;
+
+        if (mccv != null)
+            newSize += mccv.GetBytes().Length;
+
+        newSize += mcnr.GetBytes().Length;
+
+        if (mcse != null)
+            newSize += mcse.GetBytes().Length;
+
+        newSize += 128; //128 bytes for the MCNKheader
+
+        return newSize;
+    }
+}
+
+#region subchunks
+
+internal class MCVT : Chunk
+{
+    private readonly float[] heightmap; // = new float[9*9 + 8*8];
+
+    public MCVT(WOTLK.Chunks.MCVT wotlk) : base(wotlk, true)
+    {
+        heightmap = wotlk.Heightmap;
+        // = [145]
+    }
+
+    public override byte[] GetBytes()
+    {
+        var bytes = new List<byte>();
+
+        bytes.AddRange(Header.GetBytes());
+
+        foreach (var x in heightmap) bytes.AddRange(BitConverter.GetBytes(x));
+
+        return bytes.ToArray();
+    }
+
+    public override int RecalculateSize()
+    {
+        throw new NotImplementedException();
+    }
+}
+
+internal class MCCV : Chunk
+{
+    private readonly MCCVentry[] entries;
+
+    public MCCV(WOTLK.Chunks.MCCV wotlk) : base(wotlk, true)
+    {
+        entries = wotlk.Entries;
+    }
+
+    public override byte[] GetBytes()
+    {
+        var bytes = new List<byte>();
+
+        bytes.AddRange(Header.GetBytes());
+
+        foreach (var x in entries) bytes.AddRange(x.GetBytes());
+
+        return bytes.ToArray();
+    }
+
+    public override int RecalculateSize()
+    {
+        throw new NotImplementedException();
+    }
+}
+
+internal class MCNR : Chunk
+{
+    private readonly MCNRentry[] entries; // = new MCNRentry[9*9 + 8*8];
+
+    private readonly byte[]
+        padding; /* = new byte[13]; | this data is not included in the MCNR chunk but additional data which purpose is unknown. 0.5.3.3368 lists this as padding
          always 0 112 245  18 0  8 0 0  0 84  245 18 0. Nobody yet found a different pattern. The data is not derived from the normals.
          It also does not seem that the client reads this data. --Schlumpf (talk) 23:01, 26 July 2015 (UTC)
          While stated that this data is not "included in the MCNR chunk", the chunk-size defined for the MCNR chunk does cover this data. --Kruithne Feb 2016
          ... from Cataclysm only (on LK files and before, MCNR defined size is 435 and not 448) Mjollna (talk) */
 
-        public MCNR(Files.WOTLK.Chunks.MCNR wotlk) : base(wotlk, true)
-        {
-            entries = wotlk.Entries;
-            padding = wotlk.Padding;
-
-            Header.AddSize(13);
-        }
-
-        public override byte[] GetBytes()
-        {
-            List<byte> bytes = new List<byte>();
-
-            bytes.AddRange(Header.GetBytes());
-
-            foreach (MCNRentry x in entries)
-            {
-                bytes.AddRange(x.GetBytes());
-            }
-
-            bytes.AddRange(padding);
-
-            return bytes.ToArray();
-        }
-
-        public override int RecalculateSize()
-        {
-            throw new NotImplementedException();
-        }
-    }   
-
-    [System.Diagnostics.DebuggerDisplay("Count: {count}")]
-    class MCSE : Chunk
+    public MCNR(WOTLK.Chunks.MCNR wotlk) : base(wotlk, true)
     {
-        MCSEentry[] entries;
-        int count = 0;
+        entries = wotlk.Entries;
+        padding = wotlk.Padding;
 
-        public MCSE(Files.WOTLK.Chunks.MCSE wotlk) : base(wotlk, true)
-        {
-            entries = wotlk.Entries;
-            count = wotlk.Count;
-        }
-
-        public override byte[] GetBytes()
-        {
-            List<byte> bytes = new List<byte>();
-
-            bytes.AddRange(Header.GetBytes());
-
-            if (count > 0)
-            {
-                foreach (MCSEentry x in entries)
-                {
-                    bytes.AddRange(x.GetBytes());
-                }
-            }
-
-            return bytes.ToArray();
-        }
-
-        public override int RecalculateSize()
-        {
-            throw new NotImplementedException();
-        }
+        Header.AddSize(13);
     }
-    #endregion
+
+    public override byte[] GetBytes()
+    {
+        var bytes = new List<byte>();
+
+        bytes.AddRange(Header.GetBytes());
+
+        foreach (var x in entries) bytes.AddRange(x.GetBytes());
+
+        bytes.AddRange(padding);
+
+        return bytes.ToArray();
+    }
+
+    public override int RecalculateSize()
+    {
+        throw new NotImplementedException();
+    }
 }
+
+[DebuggerDisplay("Count: {count}")]
+internal class MCSE : Chunk
+{
+    private readonly int count;
+    private readonly MCSEentry[] entries;
+
+    public MCSE(WOTLK.Chunks.MCSE wotlk) : base(wotlk, true)
+    {
+        entries = wotlk.Entries;
+        count = wotlk.Count;
+    }
+
+    public override byte[] GetBytes()
+    {
+        var bytes = new List<byte>();
+
+        bytes.AddRange(Header.GetBytes());
+
+        if (count > 0)
+            foreach (var x in entries)
+                bytes.AddRange(x.GetBytes());
+
+        return bytes.ToArray();
+    }
+
+    public override int RecalculateSize()
+    {
+        throw new NotImplementedException();
+    }
+}
+
+#endregion

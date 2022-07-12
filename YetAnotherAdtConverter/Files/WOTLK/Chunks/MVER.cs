@@ -1,16 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿namespace YetAnotherAdtConverter.Files.WOTLK.Chunks;
 
-namespace YetAnotherAdtConverter.Files.WOTLK.Chunks
+//[System.Diagnostics.DebuggerDisplay("Version: {version}")]
+internal class MVER : Chunk
 {
-    //[System.Diagnostics.DebuggerDisplay("Version: {version}")]
-    class MVER : Chunk
+    public byte[] version;
+
+    public MVER(char[] magic, byte[] size, byte[] content) : base(magic, size)
     {
-        public byte[] version;
-        public MVER(char[] magic, byte[] size, byte[] content) : base(magic, size)
-        {
-            version = content;
-        }
+        version = content;
     }
 }

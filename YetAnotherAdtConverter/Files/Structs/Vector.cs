@@ -1,32 +1,25 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Diagnostics;
 
-namespace YetAnotherAdtConverter.Files.Structs
+namespace YetAnotherAdtConverter.Files.Structs;
+
+/// <summary>
+///     <para>This structure has a fixed size of 12 bytes.</para>
+/// </summary>
+[DebuggerDisplay("{x}, {y}, {z}")]
+internal struct Vector
 {
-    /// <summary>
-    /// <para>This structure has a fixed size of 12 bytes.</para>
-    /// </summary>
-    [System.Diagnostics.DebuggerDisplay("{x}, {y}, {z}")]
-    internal struct Vector
+    public float X { get; set; }
+    public float Y { get; set; }
+    public float Z { get; set; }
+
+    public byte[] GetBytes()
     {
-        float x;
-        float y;
-        float z;
+        var bytes = new List<byte>();
 
-        public float X { get => x; set => x = value; }
-        public float Y { get => y; set => y = value; }
-        public float Z { get => z; set => z = value; }
+        bytes.AddRange(BitConverter.GetBytes(X));
+        bytes.AddRange(BitConverter.GetBytes(Y));
+        bytes.AddRange(BitConverter.GetBytes(Z));
 
-        public byte[] GetBytes()
-        {
-            List<byte> bytes = new List<byte>();
-
-            bytes.AddRange(BitConverter.GetBytes(x));
-            bytes.AddRange(BitConverter.GetBytes(y));
-            bytes.AddRange(BitConverter.GetBytes(z));
-
-            return bytes.ToArray();
-        }
+        return bytes.ToArray();
     }
 }

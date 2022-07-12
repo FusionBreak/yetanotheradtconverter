@@ -1,58 +1,50 @@
 ﻿using YetAnotherAdtConverter.Files.Structs;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
-namespace YetAnotherAdtConverter.Files.BFA.Chunks
+namespace YetAnotherAdtConverter.Files.BFA.Chunks;
+
+internal class MLMD : Chunk
 {
-    class MLMD : Chunk
+    private readonly List<lod_object_def> lod_object_defs = new();
+
+    public MLMD(WOTLK.Chunks.MODF wotlk) : base(wotlk, "MLMD")
     {
-        List<lod_object_def> lod_object_defs = new List<lod_object_def>();
-
-        public MLMD(WOTLK.Chunks.MODF wotlk) : base(wotlk, "MLMD", false)
+        foreach (var mapObj in wotlk.MapObjDefs)
         {
-            foreach(mapObjDef mapObj in wotlk.MapObjDefs)
+            var lodObj = new lod_object_def
             {
-                lod_object_def lodObj = new lod_object_def();
-                lodObj.NameID = mapObj.NameID;
-                lodObj.UniqueID = mapObj.UniqueID;
-                lodObj.Position = mapObj.Position;
-                lodObj.Rotation = mapObj.Rotation;
-                lodObj.Flags = mapObj.Flags;
-                lodObj.DoodadSet = mapObj.DoodadSet;
-                lodObj.NameSet = mapObj.NameSet;
+                NameID = mapObj.NameID,
+                UniqueID = mapObj.UniqueID,
+                Position = mapObj.Position,
+                Rotation = mapObj.Rotation,
+                Flags = mapObj.Flags,
+                DoodadSet = mapObj.DoodadSet,
+                NameSet = mapObj.NameSet,
 
-                lodObj.Unk = 1024;
+                Unk = 1024
+            };
 
-                lod_object_defs.Add(lodObj);
-            }
-
-            Header.ChangeSize(RecalculateSize());
+            lod_object_defs.Add(lodObj);
         }
 
-        public override byte[] GetBytes()
-        {
-            List<byte> bytes = new List<byte>();
-            bytes.AddRange(Header.GetBytes());
+        Header.ChangeSize(RecalculateSize());
+    }
 
-            foreach (lod_object_def x in lod_object_defs)
-            {
-                bytes.AddRange(x.GetBytes());
-            }
+    public override byte[] GetBytes()
+    {
+        var bytes = new List<byte>();
+        bytes.AddRange(Header.GetBytes());
 
-            return bytes.ToArray();
-        }
+        foreach (var x in lod_object_defs) bytes.AddRange(x.GetBytes());
 
-        public override int RecalculateSize()
-        {
-            int newSize = 0;
+        return bytes.ToArray();
+    }
 
-            foreach (lod_object_def x in lod_object_defs)
-            {
-                newSize += x.GetBytes().Length;
-            }
+    public override int RecalculateSize()
+    {
+        var newSize = 0;
 
-            return newSize;
-        }
+        foreach (var x in lod_object_defs) newSize += x.GetBytes().Length;
+
+        return newSize;
     }
 }

@@ -1,38 +1,41 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Diagnostics;
 
-namespace YetAnotherAdtConverter.Files.Structs
+namespace YetAnotherAdtConverter.Files.Structs;
+
+[DebuggerDisplay("uniqueID: {uniqueID}")]
+internal struct DoodadDef
 {
-    [System.Diagnostics.DebuggerDisplay("uniqueID: {uniqueID}")]
-    struct DoodadDef
+    private Vector position;
+    private Vector rotation;
+
+    public uint NameID { get; set; }
+    public uint UniqueID { get; set; }
+    public ushort Scale { get; set; }
+    public ushort Flags { get; set; }
+
+    internal Vector Position
     {
-        UInt32 nameID;
-        UInt32 uniqueID;
-        Vector position;
-        Vector rotation;
-        UInt16 scale;
-        UInt16 flags;
+        get => position;
+        set => position = value;
+    }
 
-        public UInt32 NameID { get => nameID; set => nameID = value; }
-        public UInt32 UniqueID { get => uniqueID; set => uniqueID = value; }
-        public UInt16 Scale { get => scale; set => scale = value; }
-        public UInt16 Flags { get => flags; set => flags = value; }
-        internal Vector Position { get => position; set => position = value; }
-        internal Vector Rotation { get => rotation; set => rotation = value; }
+    internal Vector Rotation
+    {
+        get => rotation;
+        set => rotation = value;
+    }
 
-        public byte[] GetBytes()
-        {
-            List<byte> bytes = new List<byte>();
+    public byte[] GetBytes()
+    {
+        var bytes = new List<byte>();
 
-            bytes.AddRange(BitConverter.GetBytes(nameID));
-            bytes.AddRange(BitConverter.GetBytes(uniqueID));
-            bytes.AddRange(position.GetBytes());
-            bytes.AddRange(rotation.GetBytes());
-            bytes.AddRange(BitConverter.GetBytes(scale));
-            bytes.AddRange(BitConverter.GetBytes(flags));
+        bytes.AddRange(BitConverter.GetBytes(NameID));
+        bytes.AddRange(BitConverter.GetBytes(UniqueID));
+        bytes.AddRange(position.GetBytes());
+        bytes.AddRange(rotation.GetBytes());
+        bytes.AddRange(BitConverter.GetBytes(Scale));
+        bytes.AddRange(BitConverter.GetBytes(Flags));
 
-            return bytes.ToArray();
-        }
+        return bytes.ToArray();
     }
 }

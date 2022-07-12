@@ -1,25 +1,24 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿namespace YetAnotherAdtConverter.Files.Structs;
 
-namespace YetAnotherAdtConverter.Files.Structs
+internal struct lod_extent
 {
-    struct lod_extent
+    private CAaBox bounding;
+
+    public float Radius { get; set; }
+
+    internal CAaBox Bounding
     {
-        CAaBox bounding;
-        Single radius;
+        get => bounding;
+        set => bounding = value;
+    }
 
-        public Single Radius { get => radius; set => radius = value; }
-        internal CAaBox Bounding { get => bounding; set => bounding = value; }
+    public byte[] GetBytes()
+    {
+        var bytes = new List<byte>();
 
-        public byte[] GetBytes()
-        {
-            List<byte> bytes = new List<byte>();
+        bytes.AddRange(bounding.GetBytes());
+        bytes.AddRange(BitConverter.GetBytes(Radius));
 
-            bytes.AddRange(bounding.GetBytes());
-            bytes.AddRange(BitConverter.GetBytes(radius));
-
-            return bytes.ToArray();
-        }
+        return bytes.ToArray();
     }
 }

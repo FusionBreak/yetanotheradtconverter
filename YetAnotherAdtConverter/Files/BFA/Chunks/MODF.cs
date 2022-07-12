@@ -1,35 +1,28 @@
 ﻿using YetAnotherAdtConverter.Files.Structs;
-using System;
-using System.Collections.Generic;
-using System.Text;
-using YetAnotherAdtConverter.Files.WOTLK;
 
-namespace YetAnotherAdtConverter.Files.BFA.Chunks
+namespace YetAnotherAdtConverter.Files.BFA.Chunks;
+
+internal class MODF : Chunk
 {
-    class MODF : Chunk
+    private readonly List<mapObjDef> mapObjDefs = new();
+
+    public MODF(WOTLK.Chunks.MODF wotlk) : base(wotlk)
     {
-        List<mapObjDef> mapObjDefs = new List<mapObjDef>();
-        public MODF(WOTLK.Chunks.MODF wotlk) : base(wotlk, false)
-        {
-            mapObjDefs = wotlk.MapObjDefs;
-        }
+        mapObjDefs = wotlk.MapObjDefs;
+    }
 
-        public override byte[] GetBytes()
-        {
-            List<byte> bytes = new List<byte>();
-            bytes.AddRange(Header.GetBytes());
+    public override byte[] GetBytes()
+    {
+        var bytes = new List<byte>();
+        bytes.AddRange(Header.GetBytes());
 
-            foreach (mapObjDef x in mapObjDefs)
-            {
-                bytes.AddRange(x.GetBytes());
-            }
+        foreach (var x in mapObjDefs) bytes.AddRange(x.GetBytes());
 
-            return bytes.ToArray();
-        }
+        return bytes.ToArray();
+    }
 
-        public override int RecalculateSize()
-        {
-            throw new NotImplementedException();
-        }
+    public override int RecalculateSize()
+    {
+        throw new NotImplementedException();
     }
 }

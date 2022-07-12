@@ -1,43 +1,42 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿namespace YetAnotherAdtConverter.Files.Structs;
 
-namespace YetAnotherAdtConverter.Files.Structs
+internal struct lod_object_def
 {
-    struct lod_object_def
+    private Vector position;
+    private Vector rotation;
+
+    public uint NameID { get; set; }
+    public uint UniqueID { get; set; }
+    public ushort Flags { get; set; }
+    public ushort DoodadSet { get; set; }
+    public ushort NameSet { get; set; }
+    public ushort Unk { get; set; }
+
+    internal Vector Position
     {
-        UInt32 nameID;
-        UInt32 uniqueID;
-        Vector position;
-        Vector rotation;
-        UInt16 flags;
-        UInt16 doodadSet;
-        UInt16 nameSet;
-        UInt16 unk;
+        get => position;
+        set => position = value;
+    }
 
-        public uint NameID { get => nameID; set => nameID = value; }
-        public uint UniqueID { get => uniqueID; set => uniqueID = value; }
-        public ushort Flags { get => flags; set => flags = value; }
-        public ushort DoodadSet { get => doodadSet; set => doodadSet = value; }
-        public ushort NameSet { get => nameSet; set => nameSet = value; }
-        public ushort Unk { get => unk; set => unk = value; }
-        internal Vector Position { get => position; set => position = value; }
-        internal Vector Rotation { get => rotation; set => rotation = value; }
+    internal Vector Rotation
+    {
+        get => rotation;
+        set => rotation = value;
+    }
 
-        public byte[] GetBytes()
-        {
-            List<byte> bytes = new List<byte>();
+    public byte[] GetBytes()
+    {
+        var bytes = new List<byte>();
 
-            bytes.AddRange(BitConverter.GetBytes(nameID));
-            bytes.AddRange(BitConverter.GetBytes(uniqueID));
-            bytes.AddRange(position.GetBytes());
-            bytes.AddRange(rotation.GetBytes());
-            bytes.AddRange(BitConverter.GetBytes(flags));
-            bytes.AddRange(BitConverter.GetBytes(doodadSet));
-            bytes.AddRange(BitConverter.GetBytes(nameSet));
-            bytes.AddRange(BitConverter.GetBytes(unk));
+        bytes.AddRange(BitConverter.GetBytes(NameID));
+        bytes.AddRange(BitConverter.GetBytes(UniqueID));
+        bytes.AddRange(position.GetBytes());
+        bytes.AddRange(rotation.GetBytes());
+        bytes.AddRange(BitConverter.GetBytes(Flags));
+        bytes.AddRange(BitConverter.GetBytes(DoodadSet));
+        bytes.AddRange(BitConverter.GetBytes(NameSet));
+        bytes.AddRange(BitConverter.GetBytes(Unk));
 
-            return bytes.ToArray();
-        }
+        return bytes.ToArray();
     }
 }

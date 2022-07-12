@@ -1,139 +1,133 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using YetAnotherAdtConverter.Files.WOTLK;
-using YetAnotherAdtConverter.Files.Structs;
+﻿using YetAnotherAdtConverter.Files.Structs;
+using YetAnotherAdtConverter.Files.WOTLK.Chunks;
 
-namespace YetAnotherAdtConverter.Files.BFA.Chunks
+namespace YetAnotherAdtConverter.Files.BFA.Chunks;
+
+internal class MCNK_TEX0 : Chunk
 {
-    class MCNK_TEX0 : Chunk
+    private readonly MCAL mcal;
+    private readonly MCLY mcly;
+    private readonly MCSH mcsh;
+
+    public MCNK_TEX0(MCNK wotlk) : base(wotlk)
     {
-        MCLY mcly;
-        MCSH mcsh;
-        MCAL mcal;
-        public MCNK_TEX0(WOTLK.Chunks.MCNK wotlk) : base(wotlk, false)
-        {
-            if (wotlk.Mcly != null)
-                mcly = new MCLY(wotlk.Mcly);
+        if (wotlk.Mcly != null)
+            mcly = new MCLY(wotlk.Mcly);
 
-            if (wotlk.Mcsh != null)
-                mcsh = new MCSH(wotlk.Mcsh);
+        if (wotlk.Mcsh != null)
+            mcsh = new MCSH(wotlk.Mcsh);
 
-            if (wotlk.Mcal != null)
-                mcal = new MCAL(wotlk.Mcal);
+        if (wotlk.Mcal != null)
+            mcal = new MCAL(wotlk.Mcal);
 
-            Header.ChangeSize(RecalculateSize());
-        }
-
-        public override byte[] GetBytes()
-        {
-            List<byte> bytes = new List<byte>();
-            bytes.AddRange(Header.GetBytes());
-
-            if (mcly != null)
-                bytes.AddRange(mcly.GetBytes());
-
-            if (mcsh != null)
-                bytes.AddRange(mcsh.GetBytes());
-
-            if (mcal != null)
-                bytes.AddRange(mcal.GetBytes());
-
-            return bytes.ToArray();
-        }
-
-        public override int RecalculateSize()
-        {
-            int newSize = 0;
-
-            if (mcly != null)
-                newSize += mcly.GetBytes().Length;
-
-            if (mcsh != null)
-                newSize += mcsh.GetBytes().Length;
-
-            if (mcal != null)
-                newSize += mcal.GetBytes().Length;
-
-            return newSize;
-        }
+        Header.ChangeSize(RecalculateSize());
     }
 
-    class MCLY : Chunk
+    public override byte[] GetBytes()
     {
-        List<MCLYentry> entries;
+        var bytes = new List<byte>();
+        bytes.AddRange(Header.GetBytes());
 
-        public MCLY(Files.WOTLK.Chunks.MCLY wotlk) : base(wotlk, true)
-        {
-            entries = wotlk.Entries;
-        }
+        if (mcly != null)
+            bytes.AddRange(mcly.GetBytes());
 
-        public override byte[] GetBytes()
-        {
-            List<byte> bytes = new List<byte>();
-            bytes.AddRange(Header.GetBytes());
+        if (mcsh != null)
+            bytes.AddRange(mcsh.GetBytes());
 
-            foreach (MCLYentry x in entries)
-            {
-                bytes.AddRange(x.GetBytes());
-            }
+        if (mcal != null)
+            bytes.AddRange(mcal.GetBytes());
 
-            return bytes.ToArray();
-        }
-
-        public override int RecalculateSize()
-        {
-            throw new NotImplementedException();
-        }
+        return bytes.ToArray();
     }
 
-    class MCSH : Chunk
+    public override int RecalculateSize()
     {
-        byte[] data;
+        var newSize = 0;
 
-        public MCSH(Files.WOTLK.Chunks.MCSH wotlk) : base(wotlk, true)
-        {
-            data = wotlk.Data;
-        }
+        if (mcly != null)
+            newSize += mcly.GetBytes().Length;
 
-        public override byte[] GetBytes()
-        {
-            List<byte> bytes = new List<byte>();
-            bytes.AddRange(Header.GetBytes());
+        if (mcsh != null)
+            newSize += mcsh.GetBytes().Length;
 
-            bytes.AddRange(data);
+        if (mcal != null)
+            newSize += mcal.GetBytes().Length;
 
-            return bytes.ToArray();
-        }
+        return newSize;
+    }
+}
 
-        public override int RecalculateSize()
-        {
-            throw new NotImplementedException();
-        }
+internal class MCLY : Chunk
+{
+    private readonly List<MCLYentry> entries;
+
+    public MCLY(WOTLK.Chunks.MCLY wotlk) : base(wotlk, true)
+    {
+        entries = wotlk.Entries;
     }
 
-    class MCAL : Chunk
+    public override byte[] GetBytes()
     {
-        byte[] data;
+        var bytes = new List<byte>();
+        bytes.AddRange(Header.GetBytes());
 
-        public MCAL(Files.WOTLK.Chunks.MCAL wotlk) : base(wotlk, true)
-        {
-            data = wotlk.Data;
-        }
+        foreach (var x in entries) bytes.AddRange(x.GetBytes());
 
-        public override byte[] GetBytes()
-        {
-            List<byte> bytes = new List<byte>();
-            bytes.AddRange(Header.GetBytes());
+        return bytes.ToArray();
+    }
 
-            bytes.AddRange(data);
+    public override int RecalculateSize()
+    {
+        throw new NotImplementedException();
+    }
+}
 
-            return bytes.ToArray();
-        }
+internal class MCSH : Chunk
+{
+    private readonly byte[] data;
 
-        public override int RecalculateSize()
-        {
-            throw new NotImplementedException();
-        }
+    public MCSH(WOTLK.Chunks.MCSH wotlk) : base(wotlk, true)
+    {
+        data = wotlk.Data;
+    }
+
+    public override byte[] GetBytes()
+    {
+        var bytes = new List<byte>();
+        bytes.AddRange(Header.GetBytes());
+
+        bytes.AddRange(data);
+
+        return bytes.ToArray();
+    }
+
+    public override int RecalculateSize()
+    {
+        throw new NotImplementedException();
+    }
+}
+
+internal class MCAL : Chunk
+{
+    private readonly byte[] data;
+
+    public MCAL(WOTLK.Chunks.MCAL wotlk) : base(wotlk, true)
+    {
+        data = wotlk.Data;
+    }
+
+    public override byte[] GetBytes()
+    {
+        var bytes = new List<byte>();
+        bytes.AddRange(Header.GetBytes());
+
+        bytes.AddRange(data);
+
+        return bytes.ToArray();
+    }
+
+    public override int RecalculateSize()
+    {
+        throw new NotImplementedException();
     }
 }

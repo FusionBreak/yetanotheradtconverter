@@ -1,35 +1,32 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using YetAnotherAdtConverter.Files.WOTLK;
+﻿using System.Text;
 
-namespace YetAnotherAdtConverter.Files.BFA.Chunks
+namespace YetAnotherAdtConverter.Files.BFA.Chunks;
+
+internal class MWMO : Chunk
 {
-    class MWMO : Chunk
+    private readonly List<string> wmos = new();
+
+    public MWMO(WOTLK.Chunks.MWMO wotlk) : base(wotlk)
     {
-        List<string> wmos = new List<string>();
-        public MWMO(WOTLK.Chunks.MWMO wotlk) : base(wotlk, false)
+        wmos = wotlk.Wmos;
+    }
+
+    public override byte[] GetBytes()
+    {
+        var bytes = new List<byte>();
+        bytes.AddRange(Header.GetBytes());
+
+        foreach (var x in wmos)
         {
-            wmos = wotlk.Wmos;
+            bytes.AddRange(Encoding.ASCII.GetBytes(x));
+            bytes.Add(0x0);
         }
 
-        public override byte[] GetBytes()
-        {
-            List<byte> bytes = new List<byte>();
-            bytes.AddRange(Header.GetBytes());
+        return bytes.ToArray();
+    }
 
-            foreach (string x in wmos)
-            {
-                bytes.AddRange(Encoding.ASCII.GetBytes(x));
-                bytes.Add(0x0);
-            }
-
-            return bytes.ToArray();
-        }
-
-        public override int RecalculateSize()
-        {
-            throw new NotImplementedException();
-        }
+    public override int RecalculateSize()
+    {
+        throw new NotImplementedException();
     }
 }

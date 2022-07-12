@@ -1,26 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿namespace YetAnotherAdtConverter.Files.Structs;
 
-namespace YetAnotherAdtConverter.Files.Structs
+internal struct Plane
 {
-    struct Plane
+    public byte[] GetBytes()
     {
-        Int16[][] height; // = [3][3]
+        var bytes = new List<byte>();
+        for (var x = 0; x < 3; x++)
+        for (var y = 0; y < 3; y++)
+            bytes.AddRange(BitConverter.GetBytes(Height[x][y])); //
 
-        public byte[] GetBytes()
-        {
-            List<byte> bytes = new List<byte>();
-            for (int x=0; x < 3; x++)
-            {
-                for (int y = 0; y < 3; y++)
-                {
-                    bytes.AddRange(BitConverter.GetBytes(height[x][y])); //
-                }
-            }
-            return bytes.ToArray();
-        }
-
-        public short[][] Height { get => height; set => height = value; }
+        return bytes.ToArray();
     }
+
+    public short[][] Height { get; set; }
 }

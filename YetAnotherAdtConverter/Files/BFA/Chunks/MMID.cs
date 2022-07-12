@@ -1,34 +1,26 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using YetAnotherAdtConverter.Files.WOTLK;
+﻿namespace YetAnotherAdtConverter.Files.BFA.Chunks;
 
-namespace YetAnotherAdtConverter.Files.BFA.Chunks
+internal class MMID : Chunk
 {
-    class MMID : Chunk
+    private readonly List<uint> offsets = new();
+
+    public MMID(WOTLK.Chunks.MMID wotlk) : base(wotlk)
     {
-        List<UInt32> offsets = new List<UInt32>();
-        public MMID(WOTLK.Chunks.MMID wotlk) : base(wotlk, false)
-        {
-            offsets = wotlk.Offsets;
-        }
+        offsets = wotlk.Offsets;
+    }
 
-        public override byte[] GetBytes()
-        {
-            List<byte> bytes = new List<byte>();
-            bytes.AddRange(Header.GetBytes());
+    public override byte[] GetBytes()
+    {
+        var bytes = new List<byte>();
+        bytes.AddRange(Header.GetBytes());
 
-            foreach (int x in offsets)
-            {
-                bytes.AddRange(BitConverter.GetBytes(x));
-            }
+        foreach (int x in offsets) bytes.AddRange(BitConverter.GetBytes(x));
 
-            return bytes.ToArray();
-        }
+        return bytes.ToArray();
+    }
 
-        public override int RecalculateSize()
-        {
-            throw new NotImplementedException();
-        }
+    public override int RecalculateSize()
+    {
+        throw new NotImplementedException();
     }
 }

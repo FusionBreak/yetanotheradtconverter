@@ -1,119 +1,120 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
+﻿using System.Diagnostics;
 using YetAnotherAdtConverter.Files.WOTLK.Chunks;
 
+namespace YetAnotherAdtConverter.Files.WOTLK;
 
-namespace YetAnotherAdtConverter.Files.WOTLK
+[DebuggerDisplay("{ADTfileInfo.Name} | {Length/1024}KB")]
+internal class ADT
 {
-    [System.Diagnostics.DebuggerDisplay("{ADTfileInfo.Name} | {Length/1024}KB")]
-    class ADT
+    private readonly int Length;
+    public FileInfo ADTfileInfo;
+    public MCIN MCIN;
+    public List<MCNK> MCNKs = new();
+    public MDDF MDDF;
+    public MFBO MFBO;
+    public MH2O MH2O;
+    public MHDR MHDR;
+    public MMDX MMDX;
+    public MMID MMID;
+    public MODF MODF;
+    public MTEX MTEX;
+
+    public MVER MVER;
+    public MWID MWID;
+    public MWMO MWMO;
+
+    public ADT(string filePath)
     {
-        public FileInfo ADTfileInfo;
-        int Length;
+        ADTfileInfo = new FileInfo(filePath);
+        //Start reading the .ADT File
+        using var reader = new BinaryReader(ADTfileInfo.Open(FileMode.Open));
+        Length = (int)reader.BaseStream.Length;
+        _ = reader.BaseStream.Seek(0, SeekOrigin.Begin);
+        var MCNK_counter = 0;
+        var MCNK_size = 0;
 
-        public MVER MVER;
-        public MHDR MHDR;
-        public MCIN MCIN;
-        public MTEX MTEX;
-        public MMDX MMDX;
-        public MMID MMID;
-        public MWMO MWMO;
-        public MWID MWID;
-        public MDDF MDDF;
-        public MODF MODF;
-        public MH2O MH2O;
-        public List<MCNK> MCNKs = new List<MCNK>();
-        public MFBO MFBO;
-
-        public ADT(string filePath)
+        while (reader.BaseStream.Position < reader.BaseStream.Length)
         {
-            ADTfileInfo = new FileInfo(filePath);
-            //Start reading the .ADT File
-            using(BinaryReader reader = new BinaryReader(ADTfileInfo.Open(FileMode.Open)))
+            var ChunkMagic = reader.ReadBytes(4);
+            var ChunkSize = reader.ReadBytes(4);
+            var ChunkContent = reader.ReadBytes(BitConverter.ToInt32(ChunkSize, 0));
+
+            var ChunkMagicString = MagicBytesToString(ChunkMagic);
+            //read the chunks
+            switch (ChunkMagicString)
             {
-                Length = (int)reader.BaseStream.Length;
-                reader.BaseStream.Seek(0, SeekOrigin.Begin);
-                int MCNK_counter = 0;
-                int MCNK_size = 0;
-
-                while(reader.BaseStream.Position < reader.BaseStream.Length)
-                {
-                    byte[] ChunkMagic = reader.ReadBytes(4);
-                    byte[] ChunkSize = reader.ReadBytes(4);
-                    byte[] ChunkContent = reader.ReadBytes(BitConverter.ToInt32(ChunkSize, 0));
-
-                    string ChunkMagicString = MagicBytesToString(ChunkMagic);
-                    //read the chunks
-                    switch(ChunkMagicString)
-                    {
-                        case "MVER":
-                            MVER = new MVER(MagicBytesToChars(ChunkMagic), ChunkSize, ChunkContent);
-                            break;
-                        case "MHDR":
-                            MHDR = new MHDR(MagicBytesToChars(ChunkMagic), ChunkSize, ChunkContent);
-                            break;
-                        case "MCIN":
-                            MCIN = new MCIN(MagicBytesToChars(ChunkMagic), ChunkSize, ChunkContent);
-                            break;
-                        case "MTEX":
-                            MTEX = new MTEX(MagicBytesToChars(ChunkMagic), ChunkSize, ChunkContent);
-                            break;
-                        case "MMDX":
-                            MMDX = new MMDX(MagicBytesToChars(ChunkMagic), ChunkSize, ChunkContent);
-                            break;
-                        case "MMID":
-                            MMID = new MMID(MagicBytesToChars(ChunkMagic), ChunkSize, ChunkContent);
-                            break;
-                        case "MWMO":
-                            MWMO = new MWMO(MagicBytesToChars(ChunkMagic), ChunkSize, ChunkContent);
-                            break;
-                        case "MWID":
-                            MWID = new MWID(MagicBytesToChars(ChunkMagic), ChunkSize, ChunkContent);
-                            break;
-                        case "MDDF":
-                            MDDF = new MDDF(MagicBytesToChars(ChunkMagic), ChunkSize, ChunkContent);
-                            break;
-                        case "MODF":
-                            MODF = new MODF(MagicBytesToChars(ChunkMagic), ChunkSize, ChunkContent);
-                            break;
-                        case "MH2O":
-                            MH2O = new MH2O(MagicBytesToChars(ChunkMagic), ChunkSize, ChunkContent);
-                            break;
-                        case "MCNK":
-                            MCNKs.Add(new MCNK(MagicBytesToChars(ChunkMagic), ChunkSize, ChunkContent));
-                            break;
-                        case "MFBO":
-                            MFBO = new MFBO(MagicBytesToChars(ChunkMagic), ChunkSize, ChunkContent);
-                            break;
-                    }
-
-                    if(ChunkMagicString == "MCNK") { MCNK_counter++; MCNK_size += BitConverter.ToInt32(ChunkSize, 0); }
-                    else if(ChunkMagicString == "\0\0\0\0") { /*Logger.log("0 Byte Chunk", Logger.Direction.WARNING);*/ }
-                }
-            }
-        }
-
-        static public char[] MagicBytesToChars(byte[] MagicBytes)
-        {
-            char[] MagicChars;
-            MagicChars = new char[MagicBytes.Length];
-
-            int count = 0;
-            foreach(byte MagicByte in MagicBytes)
-            {
-                MagicChars[count] = Convert.ToChar(MagicByte);
-                count++;
+                case "MVER":
+                    MVER = new MVER(MagicBytesToChars(ChunkMagic), ChunkSize, ChunkContent);
+                    break;
+                case "MHDR":
+                    MHDR = new MHDR(MagicBytesToChars(ChunkMagic), ChunkSize, ChunkContent);
+                    break;
+                case "MCIN":
+                    MCIN = new MCIN(MagicBytesToChars(ChunkMagic), ChunkSize, ChunkContent);
+                    break;
+                case "MTEX":
+                    MTEX = new MTEX(MagicBytesToChars(ChunkMagic), ChunkSize, ChunkContent);
+                    break;
+                case "MMDX":
+                    MMDX = new MMDX(MagicBytesToChars(ChunkMagic), ChunkSize, ChunkContent);
+                    break;
+                case "MMID":
+                    MMID = new MMID(MagicBytesToChars(ChunkMagic), ChunkSize, ChunkContent);
+                    break;
+                case "MWMO":
+                    MWMO = new MWMO(MagicBytesToChars(ChunkMagic), ChunkSize, ChunkContent);
+                    break;
+                case "MWID":
+                    MWID = new MWID(MagicBytesToChars(ChunkMagic), ChunkSize, ChunkContent);
+                    break;
+                case "MDDF":
+                    MDDF = new MDDF(MagicBytesToChars(ChunkMagic), ChunkSize, ChunkContent);
+                    break;
+                case "MODF":
+                    MODF = new MODF(MagicBytesToChars(ChunkMagic), ChunkSize, ChunkContent);
+                    break;
+                case "MH2O":
+                    MH2O = new MH2O(MagicBytesToChars(ChunkMagic), ChunkSize, ChunkContent);
+                    break;
+                case "MCNK":
+                    MCNKs.Add(new MCNK(MagicBytesToChars(ChunkMagic), ChunkSize, ChunkContent));
+                    break;
+                case "MFBO":
+                    MFBO = new MFBO(MagicBytesToChars(ChunkMagic), ChunkSize, ChunkContent);
+                    break;
             }
 
-            Array.Reverse(MagicChars);
-
-            return MagicChars;
+            if (ChunkMagicString == "MCNK")
+            {
+                MCNK_counter++;
+                MCNK_size += BitConverter.ToInt32(ChunkSize, 0);
+            }
+            else if (ChunkMagicString == "\0\0\0\0")
+            {
+                /*Logger.log("0 Byte Chunk", Logger.Direction.WARNING);*/
+            }
         }
+    }
 
-        static public string MagicBytesToString(byte[] MagicBytes)
+    public static char[] MagicBytesToChars(byte[] MagicBytes)
+    {
+        char[] MagicChars;
+        MagicChars = new char[MagicBytes.Length];
+
+        var count = 0;
+        foreach (var MagicByte in MagicBytes)
         {
-            return new string(MagicBytesToChars(MagicBytes));
+            MagicChars[count] = Convert.ToChar(MagicByte);
+            count++;
         }
+
+        Array.Reverse(MagicChars);
+
+        return MagicChars;
+    }
+
+    public static string MagicBytesToString(byte[] MagicBytes)
+    {
+        return new(MagicBytesToChars(MagicBytes));
     }
 }

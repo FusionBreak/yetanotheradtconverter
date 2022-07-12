@@ -1,26 +1,32 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Diagnostics;
 
-namespace YetAnotherAdtConverter.Files.Structs
+namespace YetAnotherAdtConverter.Files.Structs;
+
+[DebuggerDisplay("Min: {min.X}, {min.Y}, {min.Z} | Max: {max.X}, {max.Y}, {max.Z}")]
+internal struct CAaBox
 {
-    [System.Diagnostics.DebuggerDisplay("Min: {min.X}, {min.Y}, {min.Z} | Max: {max.X}, {max.Y}, {max.Z}")]
-    struct CAaBox
+    private Vector min;
+    private Vector max;
+
+    internal Vector Min
     {
-        Vector min;
-        Vector max;
+        get => min;
+        set => min = value;
+    }
 
-        internal Vector Min { get => min; set => min = value; }
-        internal Vector Max { get => max; set => max = value; }
+    internal Vector Max
+    {
+        get => max;
+        set => max = value;
+    }
 
-        public byte[] GetBytes()
-        {
-            List<byte> bytes = new List<byte>();
+    public byte[] GetBytes()
+    {
+        var bytes = new List<byte>();
 
-            bytes.AddRange(min.GetBytes());
-            bytes.AddRange(max.GetBytes());
+        bytes.AddRange(min.GetBytes());
+        bytes.AddRange(max.GetBytes());
 
-            return bytes.ToArray();
-        }
+        return bytes.ToArray();
     }
 }

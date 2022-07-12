@@ -1,125 +1,134 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿namespace YetAnotherAdtConverter.Files.Structs;
 
-namespace YetAnotherAdtConverter.Files.Structs
+internal struct MCNKheader
 {
-    struct MCNKheader
+    private offset ofsMCVT;
+    private offset ofsMCNR;
+    private offset ofsMCLY;
+    private offset ofsMCRF;
+    private offset ofsMCAL;
+    private offset ofsMCSH;
+    private offset ofsMCSE;
+    private offset ofsMCLQ;
+    private offset ofsMCCV;
+
+    public byte[] GetBytes()
     {
-        UInt32 flags;
-        UInt32 indexX;
-        UInt32 indexY;
-        UInt32 nLayers;
-        UInt32 nDoodadRefs;
+        var bytes = new List<byte>();
 
-        offset ofsMCVT;
-        offset ofsMCNR;
-        offset ofsMCLY;
-        offset ofsMCRF;
-        offset ofsMCAL;
+        bytes.AddRange(BitConverter.GetBytes(Flags));
+        bytes.AddRange(BitConverter.GetBytes(IndexX));
+        bytes.AddRange(BitConverter.GetBytes(IndexY));
+        bytes.AddRange(BitConverter.GetBytes(NLayers));
+        bytes.AddRange(BitConverter.GetBytes(NDoodadRefs));
 
-        UInt32 sizeAlpha;
+        bytes.AddRange(BitConverter.GetBytes(ofsMCVT.address));
+        bytes.AddRange(BitConverter.GetBytes(ofsMCNR.address));
+        bytes.AddRange(BitConverter.GetBytes(ofsMCLY.address));
+        bytes.AddRange(BitConverter.GetBytes(ofsMCRF.address));
+        bytes.AddRange(BitConverter.GetBytes(ofsMCAL.address));
 
-        offset ofsMCSH;
+        bytes.AddRange(BitConverter.GetBytes(SizeAlpha));
 
-        UInt32 sizeShadow;
-        UInt32 areaid;
-        UInt32 nMapObjRefs;
-        UInt32 holes;
+        bytes.AddRange(BitConverter.GetBytes(ofsMCSH.address));
 
-        byte[] groundEffectsMap; // = new byte[16];
+        bytes.AddRange(BitConverter.GetBytes(SizeShadow));
+        bytes.AddRange(BitConverter.GetBytes(Areaid));
+        bytes.AddRange(BitConverter.GetBytes(NMapObjRefs));
+        bytes.AddRange(BitConverter.GetBytes(Holes));
 
-        UInt32 predTex;
-        UInt32 noEffectDoodad;
+        bytes.AddRange(GroundEffectsMap);
 
-        offset ofsMCSE;
-        UInt32 nSndEmitters;
+        bytes.AddRange(BitConverter.GetBytes(PredTex));
+        bytes.AddRange(BitConverter.GetBytes(NoEffectDoodad));
 
-        offset ofsMCLQ;
-        UInt32 sizeLiquid;
+        bytes.AddRange(BitConverter.GetBytes(ofsMCSE.address));
 
-        float[] pos; // = new float[3];
+        bytes.AddRange(BitConverter.GetBytes(NSndEmitters));
 
-        offset ofsMCCV;
+        bytes.AddRange(BitConverter.GetBytes(ofsMCLQ.address));
+        bytes.AddRange(BitConverter.GetBytes(SizeLiquid));
 
-        UInt32 props;
-        UInt32 effectId;
+        foreach (var x in Pos) bytes.AddRange(BitConverter.GetBytes(x));
 
-        public byte[] GetBytes()
-        {
-            List<byte> bytes = new List<byte>();
+        bytes.AddRange(BitConverter.GetBytes(ofsMCCV.address));
+        bytes.AddRange(BitConverter.GetBytes(Props));
+        bytes.AddRange(BitConverter.GetBytes(EffectId));
 
-            bytes.AddRange(BitConverter.GetBytes(flags));
-            bytes.AddRange(BitConverter.GetBytes(indexX));
-            bytes.AddRange(BitConverter.GetBytes(indexY));
-            bytes.AddRange(BitConverter.GetBytes(nLayers));
-            bytes.AddRange(BitConverter.GetBytes(nDoodadRefs));
+        return bytes.ToArray();
+    }
 
-            bytes.AddRange(BitConverter.GetBytes(ofsMCVT.address));
-            bytes.AddRange(BitConverter.GetBytes(ofsMCNR.address));
-            bytes.AddRange(BitConverter.GetBytes(ofsMCLY.address));
-            bytes.AddRange(BitConverter.GetBytes(ofsMCRF.address));
-            bytes.AddRange(BitConverter.GetBytes(ofsMCAL.address));
+    public uint Flags { get; set; }
+    public uint IndexX { get; set; }
+    public uint IndexY { get; set; }
+    public uint NLayers { get; set; }
+    public uint NDoodadRefs { get; set; }
+    public uint SizeAlpha { get; set; }
+    public uint SizeShadow { get; set; }
+    public uint Areaid { get; set; }
+    public uint NMapObjRefs { get; set; }
+    public uint Holes { get; set; }
+    public byte[] GroundEffectsMap { get; set; }
+    public uint PredTex { get; set; }
 
-            bytes.AddRange(BitConverter.GetBytes(sizeAlpha));
+    public uint NoEffectDoodad { get; set; }
+    public uint NSndEmitters { get; set; }
+    public uint SizeLiquid { get; set; }
+    public float[] Pos { get; set; }
+    public uint Props { get; set; }
+    public uint EffectId { get; set; }
 
-            bytes.AddRange(BitConverter.GetBytes(ofsMCSH.address));
+    internal offset OfsMCVT
+    {
+        get => ofsMCVT;
+        set => ofsMCVT = value;
+    }
 
-            bytes.AddRange(BitConverter.GetBytes(sizeShadow));
-            bytes.AddRange(BitConverter.GetBytes(areaid));
-            bytes.AddRange(BitConverter.GetBytes(nMapObjRefs));
-            bytes.AddRange(BitConverter.GetBytes(holes));
+    internal offset OfsMCNR
+    {
+        get => ofsMCNR;
+        set => ofsMCNR = value;
+    }
 
-            bytes.AddRange(groundEffectsMap);
+    internal offset OfsMCLY
+    {
+        get => ofsMCLY;
+        set => ofsMCLY = value;
+    }
 
-            bytes.AddRange(BitConverter.GetBytes(predTex));
-            bytes.AddRange(BitConverter.GetBytes(noEffectDoodad));
+    internal offset OfsMCRF
+    {
+        get => ofsMCRF;
+        set => ofsMCRF = value;
+    }
 
-            bytes.AddRange(BitConverter.GetBytes(ofsMCSE.address));
+    internal offset OfsMCAL
+    {
+        get => ofsMCAL;
+        set => ofsMCAL = value;
+    }
 
-            bytes.AddRange(BitConverter.GetBytes(nSndEmitters));
+    internal offset OfsMCSH
+    {
+        get => ofsMCSH;
+        set => ofsMCSH = value;
+    }
 
-            bytes.AddRange(BitConverter.GetBytes(ofsMCLQ.address));
-            bytes.AddRange(BitConverter.GetBytes(sizeLiquid));
+    internal offset OfsMCSE
+    {
+        get => ofsMCSE;
+        set => ofsMCSE = value;
+    }
 
-            foreach(float x in pos)
-            {
-                bytes.AddRange(BitConverter.GetBytes(x));
-            }
+    internal offset OfsMCLQ
+    {
+        get => ofsMCLQ;
+        set => ofsMCLQ = value;
+    }
 
-            bytes.AddRange(BitConverter.GetBytes(ofsMCCV.address));
-            bytes.AddRange(BitConverter.GetBytes(props));
-            bytes.AddRange(BitConverter.GetBytes(effectId));
-
-            return bytes.ToArray();
-        }
-
-        public uint Flags { get => flags; set => flags = value; }
-        public uint IndexX { get => indexX; set => indexX = value; }
-        public uint IndexY { get => indexY; set => indexY = value; }
-        public uint NLayers { get => nLayers; set => nLayers = value; }
-        public uint NDoodadRefs { get => nDoodadRefs; set => nDoodadRefs = value; }
-        public uint SizeAlpha { get => sizeAlpha; set => sizeAlpha = value; }
-        public uint SizeShadow { get => sizeShadow; set => sizeShadow = value; }
-        public uint Areaid { get => areaid; set => areaid = value; }
-        public uint NMapObjRefs { get => nMapObjRefs; set => nMapObjRefs = value; }
-        public uint Holes { get => holes; set => holes = value; }
-        public byte[] GroundEffectsMap { get => groundEffectsMap; set => groundEffectsMap = value; }
-        public uint PredTex { get => predTex; set => predTex = value; }
-        public uint NoEffectDoodad { get => noEffectDoodad; set => noEffectDoodad = value; }
-        public uint NSndEmitters { get => nSndEmitters; set => nSndEmitters = value; }
-        public uint SizeLiquid { get => sizeLiquid; set => sizeLiquid = value; }
-        public float[] Pos { get => pos; set => pos = value; }
-        public uint Props { get => props; set => props = value; }
-        public uint EffectId { get => effectId; set => effectId = value; }
-        internal offset OfsMCVT { get => ofsMCVT; set => ofsMCVT = value; }
-        internal offset OfsMCNR { get => ofsMCNR; set => ofsMCNR = value; }
-        internal offset OfsMCLY { get => ofsMCLY; set => ofsMCLY = value; }
-        internal offset OfsMCRF { get => ofsMCRF; set => ofsMCRF = value; }
-        internal offset OfsMCAL { get => ofsMCAL; set => ofsMCAL = value; }
-        internal offset OfsMCSH { get => ofsMCSH; set => ofsMCSH = value; }
-        internal offset OfsMCSE { get => ofsMCSE; set => ofsMCSE = value; }
-        internal offset OfsMCLQ { get => ofsMCLQ; set => ofsMCLQ = value; }
-        internal offset OfsMCCV { get => ofsMCCV; set => ofsMCCV = value; }
+    internal offset OfsMCCV
+    {
+        get => ofsMCCV;
+        set => ofsMCCV = value;
     }
 }

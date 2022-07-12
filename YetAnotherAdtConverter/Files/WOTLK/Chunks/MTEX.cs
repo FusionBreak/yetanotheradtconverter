@@ -1,33 +1,22 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Text;
+﻿using System.Diagnostics;
 
-namespace YetAnotherAdtConverter.Files.WOTLK.Chunks
+namespace YetAnotherAdtConverter.Files.WOTLK.Chunks;
+
+[DebuggerDisplay("{textures.Count} Files")]
+internal class MTEX : Chunk
 {
-    [System.Diagnostics.DebuggerDisplay("{textures.Count} Files")]
-    class MTEX : Chunk
+    public MTEX(char[] magic, byte[] size, byte[] content) : base(magic, size)
     {
-        List<string> textures = new List<string>();
-
-        public MTEX(char[] magic, byte[] size, byte[] content) : base(magic,size)
+        using var reader = new BinaryReader(new MemoryStream(content));
+        while (reader.BaseStream.Position < reader.BaseStream.Length)
         {
-            using (BinaryReader reader = new BinaryReader(new MemoryStream(content)))
-            {               
-                while (reader.BaseStream.Position < reader.BaseStream.Length)
-                {
-                    string texture = "";
+            var texture = "";
 
-                    for(byte x = reader.ReadByte(); x != 0x00; x = reader.ReadByte())
-                    {
-                        texture += Convert.ToChar(x);                       
-                    }
+            for (var x = reader.ReadByte(); x != 0x00; x = reader.ReadByte()) texture += Convert.ToChar(x);
 
-                    textures.Add(texture);
-                }                
-            }            
+            Textures.Add(texture);
         }
-
-        public List<string> Textures { get => textures; set => textures = value; }
     }
+
+    public List<string> Textures { get; set; } = new();
 }

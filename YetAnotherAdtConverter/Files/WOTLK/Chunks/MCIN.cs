@@ -1,32 +1,25 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Text;
-using YetAnotherAdtConverter.Files.Structs;
+﻿using YetAnotherAdtConverter.Files.Structs;
 
-namespace YetAnotherAdtConverter.Files.WOTLK.Chunks
+namespace YetAnotherAdtConverter.Files.WOTLK.Chunks;
+
+internal class MCIN : Chunk
 {
-    class MCIN : Chunk
+    private readonly List<Entry> entries = new();
+
+    public MCIN(char[] magic, byte[] size, byte[] content) : base(magic, size)
     {
-        List<Entry> entries = new List<Entry>();
-
-        public MCIN(char[] magic, byte[] size, byte[] content): base(magic, size)
+        using var reader = new BinaryReader(new MemoryStream(content));
+        while (reader.BaseStream.Position < reader.BaseStream.Length)
         {
-            using (BinaryReader reader = new BinaryReader(new MemoryStream(content)))
+            var entry = new Entry
             {
-                while (reader.BaseStream.Position < reader.BaseStream.Length)
-                {
-                    Entry entry = new Entry();
+                adress = reader.ReadUInt32(),
+                size = reader.ReadUInt32(),
+                flags = reader.ReadUInt32(),
+                asyncID = reader.ReadUInt32()
+            };
 
-                    
-                    entry.adress = reader.ReadUInt32();
-                    entry.size = reader.ReadUInt32();
-                    entry.flags = reader.ReadUInt32();
-                    entry.asyncID = reader.ReadUInt32();
-
-                    entries.Add(entry);
-                }           
-            }
+            entries.Add(entry);
         }
     }
 }

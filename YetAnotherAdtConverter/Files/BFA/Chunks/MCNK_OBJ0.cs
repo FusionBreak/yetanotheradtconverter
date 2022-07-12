@@ -1,127 +1,114 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using YetAnotherAdtConverter.Files.WOTLK;
+﻿using YetAnotherAdtConverter.Files.WOTLK.Chunks;
 
-namespace YetAnotherAdtConverter.Files.BFA.Chunks
+namespace YetAnotherAdtConverter.Files.BFA.Chunks;
+
+internal class MCNK_OBJ0 : Chunk
 {
-    class MCNK_OBJ0 : Chunk
+    private readonly MCRD mcrd;
+    private readonly MCRW mcrw;
+    private readonly int NDoodadRefs;
+    private readonly int NMapObjRefs;
+
+    public MCNK_OBJ0(MCNK wotlk) : base(wotlk)
     {
-        int NDoodadRefs = 0;
-        int NMapObjRefs = 0;
+        NDoodadRefs = (int)wotlk.MCHeader.NDoodadRefs;
+        NMapObjRefs = (int)wotlk.MCHeader.NMapObjRefs;
 
-        MCRD mcrd;
-        MCRW mcrw;
-        public MCNK_OBJ0(WOTLK.Chunks.MCNK wotlk) : base(wotlk, false)
+        if (NDoodadRefs > 0)
         {
-            NDoodadRefs = (int)wotlk.MCHeader.NDoodadRefs;
-            NMapObjRefs = (int)wotlk.MCHeader.NMapObjRefs;
+            var doodad = new uint[NDoodadRefs];
 
-            if(NDoodadRefs > 0)
-            {
-                UInt32[] doodad = new UInt32[NDoodadRefs];
+            for (var x = 0; x < NDoodadRefs; x++) doodad[x] = wotlk.Mcrf.Doodads[x];
 
-                for(int x = 0; x < NDoodadRefs; x++)
-                {
-                    doodad[x] = wotlk.Mcrf.Doodads[x];
-                }
-                mcrd = new MCRD("MCRD", doodad.Length*4, doodad);
-            }
-
-            if (NMapObjRefs > 0)
-            {
-                UInt32[] doodad = new UInt32[NMapObjRefs];
-
-                for (int x = 0; x < NMapObjRefs; x++)
-                {
-                    doodad[x] = wotlk.Mcrf.Doodads[x+NDoodadRefs];
-                }
-                mcrw = new MCRW("MCRW", doodad.Length * 4, doodad);
-
-            }
-
-            Header.ChangeSize(RecalculateSize());
+            mcrd = new MCRD("MCRD", doodad.Length * 4, doodad);
         }
 
-        public override byte[] GetBytes()
+        if (NMapObjRefs > 0)
         {
-            List<byte> bytes = new List<byte>();
-            bytes.AddRange(Header.GetBytes());
+            var doodad = new uint[NMapObjRefs];
 
-            if (mcrd != null)
-                bytes.AddRange(mcrd.GetBytes());
+            for (var x = 0; x < NMapObjRefs; x++) doodad[x] = wotlk.Mcrf.Doodads[x + NDoodadRefs];
 
-            if (mcrw != null)
-                bytes.AddRange(mcrw.GetBytes());
-
-            return bytes.ToArray();
+            mcrw = new MCRW("MCRW", doodad.Length * 4, doodad);
         }
 
-        public override int RecalculateSize()
-        {
-            int newSize = 0;
-
-            if (mcrd != null)
-                newSize += mcrd.GetBytes().Length;
-
-            if (mcrw != null)
-                newSize += mcrw.GetBytes().Length;
-
-            return newSize;
-        }
+        Header.ChangeSize(RecalculateSize());
     }
 
-    class MCRD : Chunk
+    public override byte[] GetBytes()
     {
-        UInt32[] doodads;
-        public MCRD(string magic, int size, UInt32[] content) : base(magic, size, true)
-        {
-            doodads = content;
-        }
+        var bytes = new List<byte>();
+        bytes.AddRange(Header.GetBytes());
 
-        public override byte[] GetBytes()
-        {
-            List<byte> bytes = new List<byte>();
-            bytes.AddRange(Header.GetBytes());
+        if (mcrd != null)
+            bytes.AddRange(mcrd.GetBytes());
 
-            foreach (UInt32 x in doodads)
-            {
-                bytes.AddRange(BitConverter.GetBytes(x));
-            }
+        if (mcrw != null)
+            bytes.AddRange(mcrw.GetBytes());
 
-            return bytes.ToArray();
-        }
-
-        public override int RecalculateSize()
-        {
-            throw new NotImplementedException();
-        }
+        return bytes.ToArray();
     }
 
-    class MCRW : Chunk
+    public override int RecalculateSize()
     {
-        UInt32[] doodads;
-        public MCRW(string magic, int size, UInt32[] content) : base(magic, size, true)
-        {
-            doodads = content;
-        }
+        var newSize = 0;
 
-        public override byte[] GetBytes()
-        {
-            List<byte> bytes = new List<byte>();
-            bytes.AddRange(Header.GetBytes());
+        if (mcrd != null)
+            newSize += mcrd.GetBytes().Length;
 
-            foreach (UInt32 x in doodads)
-            {
-                bytes.AddRange(BitConverter.GetBytes(x));
-            }
+        if (mcrw != null)
+            newSize += mcrw.GetBytes().Length;
 
-            return bytes.ToArray();
-        }
+        return newSize;
+    }
+}
 
-        public override int RecalculateSize()
-        {
-            throw new NotImplementedException();
-        }
+internal class MCRD : Chunk
+{
+    private readonly uint[] doodads;
+
+    public MCRD(string magic, int size, uint[] content) : base(magic, size, true)
+    {
+        doodads = content;
+    }
+
+    public override byte[] GetBytes()
+    {
+        var bytes = new List<byte>();
+        bytes.AddRange(Header.GetBytes());
+
+        foreach (var x in doodads) bytes.AddRange(BitConverter.GetBytes(x));
+
+        return bytes.ToArray();
+    }
+
+    public override int RecalculateSize()
+    {
+        throw new NotImplementedException();
+    }
+}
+
+internal class MCRW : Chunk
+{
+    private readonly uint[] doodads;
+
+    public MCRW(string magic, int size, uint[] content) : base(magic, size, true)
+    {
+        doodads = content;
+    }
+
+    public override byte[] GetBytes()
+    {
+        var bytes = new List<byte>();
+        bytes.AddRange(Header.GetBytes());
+
+        foreach (var x in doodads) bytes.AddRange(BitConverter.GetBytes(x));
+
+        return bytes.ToArray();
+    }
+
+    public override int RecalculateSize()
+    {
+        throw new NotImplementedException();
     }
 }

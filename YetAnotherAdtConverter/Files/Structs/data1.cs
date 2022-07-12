@@ -1,54 +1,39 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿namespace YetAnotherAdtConverter.Files.Structs;
 
-namespace YetAnotherAdtConverter.Files.Structs
+/// <summary>
+///     The function of this structure did not come to me, so it is simply called "data". ¯\_(ツ)_/¯
+///     <para>This structure has a fixed size of 24 bytes.</para>
+/// </summary>
+internal struct data1
 {
-    /// <summary> The function of this structure did not come to me, so it is simply called "data". ¯\_(ツ)_/¯
-    /// <para>This structure has a fixed size of 24 bytes.</para>
-    /// </summary>
-    struct data1
+    public ushort Flags { get; set; }
+    public ushort Type { get; set; }
+    public float Height1 { get; set; }
+    public float Height2 { get; set; }
+    public byte Xoff { get; set; }
+    public byte Yoff { get; set; }
+    public byte W { get; set; }
+    public byte H { get; set; }
+    public uint Of2a { get; set; }
+    public uint Of2b { get; set; }
+
+    public byte[] GetBytes()
     {
-        UInt16 flags;
-        UInt16 type;
-        Single height1;
-        Single height2;
-        byte xoff;
-        byte yoff;
-        byte w;
-        byte h;
-        UInt32 of2a;
-        UInt32 of2b;
+        var bytes = new List<byte>();
 
-        public UInt16 Flags { get => flags; set => flags = value; }
-        public UInt16 Type { get => type; set => type = value; }
-        public Single Height1 { get => height1; set => height1 = value; }
-        public Single Height2 { get => height2; set => height2 = value; }
-        public byte Xoff { get => xoff; set => xoff = value; }
-        public byte Yoff { get => yoff; set => yoff = value; }
-        public byte W { get => w; set => w = value; }
-        public byte H { get => h; set => h = value; }
-        public UInt32 Of2a { get => of2a; set => of2a = value; }
-        public UInt32 Of2b { get => of2b; set => of2b = value; }
+        bytes.AddRange(BitConverter.GetBytes(Flags));
+        bytes.AddRange(BitConverter.GetBytes(Type));
+        bytes.AddRange(BitConverter.GetBytes(Height1));
+        bytes.AddRange(BitConverter.GetBytes(Height2));
 
-        public byte[] GetBytes()
-        {
-            List<byte> bytes = new List<byte>();
+        bytes.Add(Xoff);
+        bytes.Add(Yoff);
+        bytes.Add(W);
+        bytes.Add(H);
 
-            bytes.AddRange(BitConverter.GetBytes(Flags));
-            bytes.AddRange(BitConverter.GetBytes(Type));
-            bytes.AddRange(BitConverter.GetBytes(Height1));
-            bytes.AddRange(BitConverter.GetBytes(Height2));
+        bytes.AddRange(BitConverter.GetBytes(Of2a));
+        bytes.AddRange(BitConverter.GetBytes(Of2b));
 
-            bytes.Add(Xoff);
-            bytes.Add(Yoff);
-            bytes.Add(W);
-            bytes.Add(H);
-
-            bytes.AddRange(BitConverter.GetBytes(Of2a));
-            bytes.AddRange(BitConverter.GetBytes(Of2b));
-
-            return bytes.ToArray();
-        }
+        return bytes.ToArray();
     }
 }

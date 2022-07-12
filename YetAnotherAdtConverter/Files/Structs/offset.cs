@@ -1,12 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Diagnostics;
 
-namespace YetAnotherAdtConverter.Files.Structs
+namespace YetAnotherAdtConverter.Files.Structs;
+
+[DebuggerDisplay("{address}")]
+internal struct offset
 {
-    [System.Diagnostics.DebuggerDisplay("{address}")]
-    struct offset
-    {
-        public UInt32 address;
-    }
+    public uint address;
 }
