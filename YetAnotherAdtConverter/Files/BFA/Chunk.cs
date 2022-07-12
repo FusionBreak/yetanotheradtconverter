@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace YetAnotherAdtConverter.Files.BFA
 {
@@ -12,31 +10,16 @@ namespace YetAnotherAdtConverter.Files.BFA
         public Chunk(Files.WOTLK.Chunk wotlk, bool isSub = false)
         {
             Header = new ChunkHeader(wotlk.Header.Magic, wotlk.Header.Size);
-
-            if (Header.GetHeaderString() != "MCNK" && !isSub)
-            {
-                Logger.log(Header.GetHeaderString(), Logger.Type.LEVEL1);
-            }
         }
 
         public Chunk(Files.WOTLK.Chunk wotlk, string magic, bool isSub = false)
         {
             Header = new ChunkHeader(magic.ToCharArray(), wotlk.Header.Size);
-
-            if (Header.GetHeaderString() != "MCNK" && !isSub)
-            {
-                Logger.log(Header.GetHeaderString(), Logger.Type.LEVEL1, "<- " + new string(wotlk.Header.Magic));
-            }
         }
 
         public Chunk(string magic, int size, bool isSub = false)
         {
             Header = new ChunkHeader(magic.ToCharArray(), BitConverter.GetBytes(size));
-
-            if (Header.GetHeaderString() != "MCNK" && !isSub)
-            {
-                Logger.log(Header.GetHeaderString(), Logger.Type.LEVEL1, "- NEW created!");
-            }
         }
 
         public float ConvertClientCoordsToServerCoords(float client)
@@ -65,8 +48,8 @@ namespace YetAnotherAdtConverter.Files.BFA
 
         public void AddSize(int x)
         {
-            int old = BitConverter.ToInt32(Size,0);
-            Size = BitConverter.GetBytes(old+x);
+            int old = BitConverter.ToInt32(Size, 0);
+            Size = BitConverter.GetBytes(old + x);
             Byte_size = BitConverter.ToInt32(Size, 0);
         }
 

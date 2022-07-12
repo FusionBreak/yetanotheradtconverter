@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace YetAnotherAdtConverter.Files.WOTLK
 {
@@ -8,15 +6,10 @@ namespace YetAnotherAdtConverter.Files.WOTLK
     class Chunk
     {
         public ChunkHeader Header;
-        
+
         public Chunk(char[] magic, byte[] size, bool isSub = false)
         {
             Header = new ChunkHeader(magic, size);
-
-            if(Header.GetHeaderString() != "MCNK" && !isSub)
-            {
-                    Logger.log(Header.GetHeaderString(), Logger.Type.LEVEL1, Header.Byte_size + " byte");
-            }            
         }
     }
 

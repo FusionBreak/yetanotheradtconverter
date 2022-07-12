@@ -1,9 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace YetAnotherAdtConverter
 {
@@ -17,28 +14,28 @@ namespace YetAnotherAdtConverter
             ReadFile();
         }
 
-        public Files.WOTLK.ADT AddGroundEffects(Files.WOTLK.ADT old)
+        public void AddGroundEffects(Files.WOTLK.ADT adt)
         {
             if(GroundEffects != null)
             {
                 bool hasBeenAdded = false;
 
-                for(int x = 0; x < old.MTEX.Textures.Count; x++)
+                for(int x = 0; x < adt.MTEX.Textures.Count; x++)
                 {
-                    old.MTEX.Textures[x] = old.MTEX.Textures[x].Replace("\\", "/");
+                    adt.MTEX.Textures[x] = adt.MTEX.Textures[x].Replace("\\", "/");
                 }
 
-                for (int x = 0; x < old.MCNKs.Count; x++)
+                for(int x = 0; x < adt.MCNKs.Count; x++)
                 {
-                    if (old.MCNKs[x].Mcly != null)
+                    if(adt.MCNKs[x].Mcly != null)
                     {
-                        for (int y = 0; y < old.MCNKs[x].Mcly.Entries.Count; y++)
+                        for(int y = 0; y < adt.MCNKs[x].Mcly.Entries.Count; y++)
                         {
-                            Files.Structs.MCLYentry entry = old.MCNKs[x].Mcly.Entries[y];
+                            Files.Structs.MCLYentry entry = adt.MCNKs[x].Mcly.Entries[y];
                             try
                             {
                                 entry.Detailtextureid = (uint)GroundEffects.Find(
-                                    a => a.TexturePath.Replace("\\", "/") == old.MTEX.Textures[(int)entry.Textid]
+                                    a => a.TexturePath.Replace("\\", "/") == adt.MTEX.Textures[(int)entry.Textid]
                                     ).GroundEffectTextureID;
                                 hasBeenAdded = true;
                             }
@@ -46,7 +43,7 @@ namespace YetAnotherAdtConverter
                             {
                                 entry.Detailtextureid = 0;
                             }
-                            old.MCNKs[x].Mcly.Entries[y] = entry;
+                            adt.MCNKs[x].Mcly.Entries[y] = entry;
                         }
                     }
 
@@ -56,32 +53,32 @@ namespace YetAnotherAdtConverter
                     //Thanks to Mjollna(modcraft.io)! I use your code for this.
                     if(hasBeenAdded)
                     {
-                        for (int y = 0; y < old.MCNKs[x].MCHeader.GroundEffectsMap.Length; y++)
-                            old.MCNKs[x].MCHeader.GroundEffectsMap[y] = 0x0;
+                        for(int y = 0; y < adt.MCNKs[x].MCHeader.GroundEffectsMap.Length; y++)
+                            adt.MCNKs[x].MCHeader.GroundEffectsMap[y] = 0x0;
 
-                        for (int layer = 1; layer < old.MCNKs[x].Mcly.Entries.Count; layer++)
+                        for(int layer = 1; layer < adt.MCNKs[x].Mcly.Entries.Count; layer++)
                         {
-                            byte[] amap = getAlphaMap(old.MCNKs[x], layer);
+                            byte[] amap = getAlphaMap(adt.MCNKs[x], layer);
 
-                            for (int a = 0; a < 8; a++)
+                            for(int a = 0; a < 8; a++)
                             {
-                                for (int b = 0; b < 8; b++)
+                                for(int b = 0; b < 8; b++)
                                 {
                                     int sum = 0;
-                                    for (int c = 0; c < 8; c++)
+                                    for(int c = 0; c < 8; c++)
                                     {
-                                        for (int d = 0; d < 8; d++)
+                                        for(int d = 0; d < 8; d++)
                                         {
                                             sum += amap[(a * 8 + c) * 64 + (b * 8 + d)];
                                         }
                                     }
 
-                                    if (sum > 120 * 8 * 8)
+                                    if(sum > 120 * 8 * 8)
                                     {
                                         int array_index = (a * 8 + b) / 4;
                                         int bit_index = ((a * 8 + b) % 4) * 2; // -6
 
-                                        old.MCNKs[x].MCHeader.GroundEffectsMap[array_index] |= Convert.ToByte(((layer & 3) << bit_index));
+                                        adt.MCNKs[x].MCHeader.GroundEffectsMap[array_index] |= Convert.ToByte(((layer & 3) << bit_index));
                                     }
                                 }
                             }
@@ -91,32 +88,27 @@ namespace YetAnotherAdtConverter
                     //print_low_quality_map(old.MCNKs[x].MCHeader.GroundEffectsMap);
 
                 }
-
-                if (hasBeenAdded)
-                    Logger.log("Added Groundeffects", Logger.Type.INFO, old.ADTfileInfo.Name);
-            }           
-
-            return old;
+            }
         }
 
         //Thanks to Mjollna(modcraft.io)!
         byte[] getAlphaMap(Files.WOTLK.Chunks.MCNK mcnk, int layer)
         {
             Files.Structs.MCLYentry mclyEntry = mcnk.Mcly.Entries[layer];
-            byte[] amap = new byte[64*64]; // 4096
-            for (int x = 0; x<amap.Length;x++) { amap[x] = 0; }
+            byte[] amap = new byte[64 * 64]; // 4096
+            for(int x = 0; x < amap.Length; x++) { amap[x] = 0; }
 
-            bool mBigAlpha = (((mcnk.Header.Byte_size / 16U) > layer+1 
+            bool mBigAlpha = (((mcnk.Header.Byte_size / 16U) > layer + 1
                             ? (mclyEntry.Ofsalphamap - mclyEntry.Ofsalphamap)
                             : (mcnk.Mcal.Data.Length - mclyEntry.Ofsalphamap)
-                                ) == 64*64                 
+                                ) == 64 * 64
                             );
 
             if((mclyEntry.Flags & 0x100 /*256*/) != 0)
             {
-                List<byte> abuf = new List<byte>(mcnk.Mcal.Data).GetRange((int)mclyEntry.Ofsalphamap, mcnk.Mcal.Data.Length - (int)mclyEntry.Ofsalphamap);               
+                List<byte> abuf = new List<byte>(mcnk.Mcal.Data).GetRange((int)mclyEntry.Ofsalphamap, mcnk.Mcal.Data.Length - (int)mclyEntry.Ofsalphamap);
 
-                if ((mclyEntry.Flags & 0x200 /*512*/) != 0)
+                if((mclyEntry.Flags & 0x200 /*512*/) != 0)
                 {
                     int offI = 0;
                     int offO = 0;
@@ -126,25 +118,25 @@ namespace YetAnotherAdtConverter
                         bool fill = (abuf[offI] & 0x80 /*128*/) != 0;
                         int n = (abuf[offI] & 0x7F /*127*/);
                         ++offI;
-                        for(int k = 0; k < n;++k)
+                        for(int k = 0; k < n; ++k)
                         {
-                            if (offO == 4096)
+                            if(offO == 4096)
                                 break;
                             amap[offO] = abuf[offI];
                             ++offO;
-                            if (!fill)
+                            if(!fill)
                                 ++offI;
                         }
-                        if (fill)
+                        if(fill)
                             ++offI;
                     }
                 }
-                else if (mBigAlpha)
+                else if(mBigAlpha)
                 {
                     int a = 0;
-                    for (int j = 0; j< 64; ++j)
+                    for(int j = 0; j < 64; ++j)
                     {
-                        for (int i = 0; i < 64; ++i)
+                        for(int i = 0; i < 64; ++i)
                         {
                             amap[a] = abuf[a];
                             a++;
@@ -156,13 +148,13 @@ namespace YetAnotherAdtConverter
                 {
                     int a = 0;
                     int b = 0;
-                    for (int j = 0; j < 64; ++j)
+                    for(int j = 0; j < 64; ++j)
                     {
-                        for (int i = 0; i < 32; ++i)
+                        for(int i = 0; i < 32; ++i)
                         {
                             amap[a] = (byte)((255 * ((int)(abuf[b] & 0x0f))) / 0x0f);
                             a++;
-                            if (i != 31)
+                            if(i != 31)
                             {
                                 amap[a] = (byte)((255 * ((int)(abuf[b] & 0xf0))) / 0xf0);
                                 a++;
@@ -175,19 +167,19 @@ namespace YetAnotherAdtConverter
                             b++;
                         }
                     }
-                    Array.Copy(amap, 62*64, amap, 63*64, 64);
+                    Array.Copy(amap, 62 * 64, amap, 63 * 64, 64);
                 }
             }
-            
+
             return amap;
         }
 
         //Thanks to Mjollna(modcraft.io)!
         void print_low_quality_map(byte[] data)
         {
-            for (int j = 0; j < 8; ++j)
+            for(int j = 0; j < 8; ++j)
             {
-                for (int i = 0; i < 8; ++i)
+                for(int i = 0; i < 8; ++i)
                 {
                     int array_index = ((j * 8 + i) / 4);
                     int bit_index = (((j * 8 + i) % 4) * 2); //6 - that ones goes 6 4 2 0 and I want it 0 2 4 6
@@ -201,7 +193,7 @@ namespace YetAnotherAdtConverter
 
         void ReadFile()
         {
-            if (!groundEffectsFile.Exists)
+            if(!groundEffectsFile.Exists)
             {
                 groundEffectsFile.Create();
             }
@@ -209,12 +201,12 @@ namespace YetAnotherAdtConverter
             {
                 StreamReader reader = new StreamReader(groundEffectsFile.FullName);
 
-                for (string line = ""; (line = reader.ReadLine()) != null;)
+                for(string line = ""; (line = reader.ReadLine()) != null;)
                 {
                     string[] setting = line.Split('=');
                     GroundEffects.Add(new GroundEffect(setting[0].Trim(), Convert.ToInt32(setting[1].Trim())));
                 }
-            }          
+            }
         }
     }
 

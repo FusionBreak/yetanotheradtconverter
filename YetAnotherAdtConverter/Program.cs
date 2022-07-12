@@ -1,6 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace YetAnotherAdtConverter
 {
@@ -22,34 +23,36 @@ namespace YetAnotherAdtConverter
 
             try
             {
-                
-                if (!InputDir.Exists) { InputDir.Create(); Logger.log("The input dir was not found and was created.", Logger.Type.WARNING, InputDir.FullName); }
-                if (!OutputDir.Exists) { OutputDir.Create(); Logger.log("The output dir was not found and was created.", Logger.Type.WARNING, OutputDir.FullName); }
-                foreach (FileInfo file in InputDir.GetFiles())
+                if(!InputDir.Exists) { InputDir.Create(); Console.WriteLine("The input dir was not found and was created."); }
+                if(!OutputDir.Exists) { OutputDir.Create(); Console.WriteLine("The output dir was not found and was created."); }
+
+                var files = InputDir.GetFiles().Where(file => file.Extension == ".adt");
+                Console.WriteLine($"Start converting: {InputDir.FullName} -> {OutputDir.FullName}");
+
+                Parallel.ForEach(files, file =>
                 {
-                    if (file.Name.Contains(".adt"))
+                    var wotlk = new Files.WOTLK.ADT(file.FullName);
+
+                    if(config.GroundEffectsAdding && !wotlk.ADTfileInfo.Name.Contains("#"))
                     {
-                        Files.WOTLK.ADT adt = new Files.WOTLK.ADT(file.FullName);
-
-                        if(config.GroundEffectsAdding && !adt.ADTfileInfo.Name.Contains("#"))
-                        {
-                            adt = effectsAdder.AddGroundEffects(adt);
-                        }
-                        new Files.BFA.ADT(adt).WriteFile(OutputDir);
-                        new Files.BFA.OBJ0(adt).WriteFile(OutputDir);
-                        new Files.BFA.OBJ1(adt).WriteFile(OutputDir);
-                        new Files.BFA.TEX0(adt).WriteFile(OutputDir);
-                        Logger.hr();
+                        effectsAdder.AddGroundEffects(wotlk);
                     }
-                }
 
-                Logger.log("Done...", Logger.Type.INFO, "Many thanks to wowdev.wiki. You have done the real work!");
+                    new Files.BFA.ADT(wotlk).WriteFile(OutputDir);
+                    new Files.BFA.OBJ0(wotlk).WriteFile(OutputDir);
+                    new Files.BFA.OBJ1(wotlk).WriteFile(OutputDir);
+                    new Files.BFA.TEX0(wotlk).WriteFile(OutputDir);
+                    Console.WriteLine($"|> {file.Name}");
+                });
+
+
+                Console.WriteLine("Done... Many thanks to wowdev.wiki. You have done the real work!");
                 System.Threading.Thread.Sleep(3000);
             }
             catch(Exception e)
             {
-                Logger.log(e.Message, Logger.Type.ERROR, e.StackTrace);
-            }            
+                Console.WriteLine(e.Message);
+            }
         }
     }
 }

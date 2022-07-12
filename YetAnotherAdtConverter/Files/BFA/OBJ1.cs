@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.IO;
+﻿using System.IO;
 using YetAnotherAdtConverter.Files.BFA.Chunks;
 
 namespace YetAnotherAdtConverter.Files.BFA
@@ -25,7 +22,6 @@ namespace YetAnotherAdtConverter.Files.BFA
         public OBJ1(Files.WOTLK.ADT wotlk)
         {
             ADTfileInfo = new FileInfo(wotlk.ADTfileInfo.Name.Split('.')[0] + "_obj1.adt");
-            Logger.log(ADTfileInfo.Name, Logger.Type.CONVERT, "<- " + wotlk.ADTfileInfo.Name);
 
             MVER = new MVER(wotlk.MVER);
             MLFD = new MLFD(wotlk.MDDF, wotlk.MODF); //I'm not sure the chunk is really needed.
@@ -41,14 +37,12 @@ namespace YetAnotherAdtConverter.Files.BFA
 
         public void WriteFile(DirectoryInfo directory)
         {
-            Logger.log(ADTfileInfo.Name, Logger.Type.WRITE, directory.FullName);
-
-            if (!directory.Exists)
+            if(!directory.Exists)
             {
                 directory.Create();
             }
 
-            using (BinaryWriter writer = new BinaryWriter(File.Open(directory.FullName + "\\" + ADTfileInfo.Name, FileMode.Create)))
+            using(BinaryWriter writer = new BinaryWriter(File.Open(directory.FullName + "\\" + ADTfileInfo.Name, FileMode.Create)))
             {
                 writer.Write(MVER.GetBytes());
 
@@ -63,8 +57,6 @@ namespace YetAnotherAdtConverter.Files.BFA
                 writer.Write(MLDX.GetBytes());
                 writer.Write(MLMD.GetBytes());
                 writer.Write(MLMX.GetBytes());
-
-                Logger.log(DateTime.Now.ToString(), Logger.Type.LEVEL1);
             }
         }
     }

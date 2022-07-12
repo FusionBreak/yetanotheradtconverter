@@ -102,7 +102,6 @@
     <Compile Include="Files\WOTLK\Chunks\MWID.cs" />
     <Compile Include="Files\WOTLK\Chunks\MWMO.cs" />
     <Compile Include="GroundEffectsAdder.cs" />
-    <Compile Include="Logger.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

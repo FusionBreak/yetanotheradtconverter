@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using System.IO;
 
 namespace YetAnotherAdtConverter
@@ -22,22 +20,10 @@ namespace YetAnotherAdtConverter
         public Config()
         {
             ReadFile();
-            
-            Logger.log("Configs:", Logger.Type.INFO);
-            Logger.log("Use log file: " + LogFile, Logger.Type.LEVEL1);
-            Logger.log("Input Directory: " + InputDir, Logger.Type.LEVEL1);
-            Logger.log("Output Directory: " + OutputDir, Logger.Type.LEVEL1);
-            Logger.log("MFBO creation: " + CreateMFBO, Logger.Type.LEVEL1);
-            Logger.log("Bounding size: " + BoundingSize, Logger.Type.LEVEL1);
-            Logger.log("Bounding radius: " + BoundingRadius, Logger.Type.LEVEL1);
-            Logger.log("Dynamic bounding generation: " + DynamicBoundingGeneration, Logger.Type.LEVEL1);
-            Logger.log("Adding ground effects: " + GroundEffectsAdding, Logger.Type.LEVEL1);
-            Logger.log("Recalculate the ground effects map: " + ReCalculateGroundEffectsMap, Logger.Type.LEVEL1);
-            Logger.hr();
         }
 
         void ReadFile()
-        {            
+        {
             if(!configFile.Exists)
             {
                 writeNewFile();
@@ -45,11 +31,11 @@ namespace YetAnotherAdtConverter
 
             StreamReader reader = new StreamReader(configFile.FullName);
 
-            for (string line = ""; (line = reader.ReadLine()) != null;)
+            for(string line = ""; (line = reader.ReadLine()) != null;)
             {
                 string[] setting = line.Split('=');
 
-                switch (setting[0].Trim())
+                switch(setting[0].Trim())
                 {
                     case "LogFile":
                         LogFile = Convert.ToBoolean(setting[1].Trim());
@@ -84,7 +70,6 @@ namespace YetAnotherAdtConverter
 
         void writeNewFile()
         {
-            Logger.log("Couldn't find any config.ini. A new one was created.", Logger.Type.WARNING);
             string[] lines = {
                 @"LogFile=" + LogFile,
                 @"Input=" + InputDir,
