@@ -2,7 +2,7 @@
 Convert [.adt files](https://wowdev.wiki/ADT/v18) from 335a (for example from Noggit) up to Legion
 
 #### Requirements: ####
-*  [.NET Framework 4.7.2](https://dotnet.microsoft.com/download)
+*  [.NET 6](https://dotnet.microsoft.com/en-us/download/dotnet/6.0)
 
 #### Usage: ####
 * Put the .adt files into the "Input" folder. If the Input folder does not exist, it will be created at first execution.
@@ -47,5 +47,6 @@ For more see [here](http://www.modcraft.io/index.php?topic=2357.0)...
 #### Upcoming plans ####
 
 - [x] Inserting Groundeffects
-- [ ] .wdl, .tex, _fogs.wdt, _lgt.wdt, _occ.wdt creation
-- [ ] BFA 8.0.1 support *(A comparison between the files from 7.2.5 and 8.0.1 showed that the .tex might have changed)*
+
+
+** 🛑 The further development for this project was stopped by me. 🛑 **
