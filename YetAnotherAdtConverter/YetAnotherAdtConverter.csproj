@@ -1,112 +1,11 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{CD1E7F00-81C5-4F8B-A228-AC1C8985D755}</ProjectGuid>
+    <TargetFramework>net6.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
     <OutputType>Exe</OutputType>
-    <RootNamespace>YetAnotherAdtConverter</RootNamespace>
-    <AssemblyName>YetAnotherAdtConverter</AssemblyName>
-    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
-    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
-    <Deterministic>true</Deterministic>
+    <StartupObject>YetAnotherAdtConverter.Program</StartupObject>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-  </PropertyGroup>
-  <ItemGroup>
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Net.Http" />
-    <Reference Include="System.Xml" />
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Include="Config.cs" />
-    <Compile Include="Files\BFA\ADT.cs" />
-    <Compile Include="Files\BFA\Chunk.cs" />
-    <Compile Include="Files\BFA\Chunks\MAMP.cs" />
-    <Compile Include="Files\BFA\Chunks\MCNK_ADT.cs" />
-    <Compile Include="Files\BFA\Chunks\MCNK_OBJ0.cs" />
-    <Compile Include="Files\BFA\Chunks\MCNK_TEX0.cs" />
-    <Compile Include="Files\BFA\Chunks\MDDF.cs" />
-    <Compile Include="Files\BFA\Chunks\MFBO.cs" />
-    <Compile Include="Files\BFA\Chunks\MH2O.cs" />
-    <Compile Include="Files\BFA\Chunks\MHDR.cs" />
-    <Compile Include="Files\BFA\Chunks\MLDD.cs" />
-    <Compile Include="Files\BFA\Chunks\MLDX.cs" />
-    <Compile Include="Files\BFA\Chunks\MLFD.cs" />
-    <Compile Include="Files\BFA\Chunks\MLMD.cs" />
-    <Compile Include="Files\BFA\Chunks\MLMX.cs" />
-    <Compile Include="Files\BFA\Chunks\MMDX.cs" />
-    <Compile Include="Files\BFA\Chunks\MMID.cs" />
-    <Compile Include="Files\BFA\Chunks\MODF.cs" />
-    <Compile Include="Files\BFA\Chunks\MTEX.cs" />
-    <Compile Include="Files\BFA\Chunks\MVER.cs" />
-    <Compile Include="Files\BFA\Chunks\MWID.cs" />
-    <Compile Include="Files\BFA\Chunks\MWMO.cs" />
-    <Compile Include="Files\BFA\OBJ0.cs" />
-    <Compile Include="Files\BFA\OBJ1.cs" />
-    <Compile Include="Files\BFA\TEX0.cs" />
-    <Compile Include="Files\Structs\CAaBox.cs" />
-    <Compile Include="Files\Structs\data1.cs" />
-    <Compile Include="Files\Structs\data2.cs" />
-    <Compile Include="Files\Structs\DoodadDef.cs" />
-    <Compile Include="Files\Structs\Entry.cs" />
-    <Compile Include="Files\Structs\lod_extent.cs" />
-    <Compile Include="Files\Structs\lod_object_def.cs" />
-    <Compile Include="Files\Structs\mapObjDef.cs" />
-    <Compile Include="Files\Structs\MCCVEntry.cs" />
-    <Compile Include="Files\Structs\MCLYentry.cs" />
-    <Compile Include="Files\Structs\MCNKheader.cs" />
-    <Compile Include="Files\Structs\MCNRentry.cs" />
-    <Compile Include="Files\Structs\MCSEentry.cs" />
-    <Compile Include="Files\Structs\MH2O_Header.cs" />
-    <Compile Include="Files\Structs\offset.cs" />
-    <Compile Include="Files\Structs\Plane.cs" />
-    <Compile Include="Files\Structs\Vector.cs" />
-    <Compile Include="Files\WOTLK\ADT.cs" />
-    <Compile Include="Files\WOTLK\Chunk.cs" />
-    <Compile Include="Files\WOTLK\Chunks\MCIN.cs" />
-    <Compile Include="Files\WOTLK\Chunks\MCNK.cs" />
-    <Compile Include="Files\WOTLK\Chunks\MDDF.cs" />
-    <Compile Include="Files\WOTLK\Chunks\MFBO.cs" />
-    <Compile Include="Files\WOTLK\Chunks\MH2O.cs" />
-    <Compile Include="Files\WOTLK\Chunks\MHDR.cs" />
-    <Compile Include="Files\WOTLK\Chunks\MMDX.cs" />
-    <Compile Include="Files\WOTLK\Chunks\MMID.cs" />
-    <Compile Include="Files\WOTLK\Chunks\MODF.cs" />
-    <Compile Include="Files\WOTLK\Chunks\MTEX.cs" />
-    <Compile Include="Files\WOTLK\Chunks\MVER.cs" />
-    <Compile Include="Files\WOTLK\Chunks\MWID.cs" />
-    <Compile Include="Files\WOTLK\Chunks\MWMO.cs" />
-    <Compile Include="GroundEffectsAdder.cs" />
-    <Compile Include="Program.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="App.config" />
-  </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+
 </Project>
